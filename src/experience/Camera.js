@@ -8,6 +8,13 @@ export default class Camera {
         this.scene = this.experience.scene
         this.canvas = this.experience.canvas
 
+        // Camera position based on sections
+        this.config = {
+            hero: { x: 0, y: 3, z: 12 },
+            immersive: { x: 0, y: 5, z: 20 },
+            lookAt: { x: 0, y: 0, z: 0 }
+        }
+
         this.setInstance()
     }
 
@@ -18,10 +25,29 @@ export default class Camera {
             0.1,
             1000
         )
-        // Default Position
-        this.instance.position.set(0, 5, 15)
+
+        this.instance.position.set(
+            this.config.hero.x, 
+            this.config.hero.y, 
+            this.config.hero.z
+        )
+
+        this.instance.lookAt(
+            this.config.lookAt.x, 
+            this.config.lookAt.y, 
+            this.config.lookAt.z
+        )
+
         this.scene.add(this.instance)
     }
+
+    setPosition(x, y, z) {
+        this.instance.position.set(x, y, z)
+    }
+
+    /*
+    * Event Manager
+    */
 
     resize() {
         this.instance.aspect = this.sizes.width / this.sizes.height
