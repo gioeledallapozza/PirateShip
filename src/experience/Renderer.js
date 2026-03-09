@@ -16,7 +16,7 @@ export default class Renderer {
         this.instance = new THREE.WebGLRenderer({
             canvas: this.canvas,
             antialias: true,
-            alpha: true //background css
+            alpha: false //background css
         })
 
         //Settings

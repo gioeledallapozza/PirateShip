@@ -4,6 +4,7 @@ import Sizes from '../utils/Sizes.js';
 import Time from '../utils/Time.js';
 import Camera from './Camera.js'; 
 import Renderer from './Renderer.js';
+import World from './world/World.js';
 
 let instance = null;
 
@@ -23,23 +24,8 @@ export default class Experience {
         this.scene = new THREE.Scene();
         this.camera = new Camera();
         this.renderer = new Renderer();
-        
-
-        // Placeholder Mesh (Sostituiremo con Sea e Ship)
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshStandardMaterial({ color: 0x00ff00, wireframe: true });
-        this.mesh = new THREE.Mesh(geometry, material);
-        this.scene.add(this.mesh);
-
-        this.sunLight = new THREE.DirectionalLight('#ffffff', 4)
-        this.sunLight.position.set(3, 5, 5)
-        this.scene.add(this.sunLight)
-
-        this.ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
-        this.scene.add(this.ambientLight)
-
-
-        console.log(this.renderer);
+        this.world = new World();
+    
         
         /*
         * Event Manager
@@ -60,6 +46,11 @@ export default class Experience {
 
     update() {
         this.camera.update()
+
+        if (this.world && this.world.sea) {
+            this.world.sea.update();
+        }
+
         this.renderer.update()
     }
 }
