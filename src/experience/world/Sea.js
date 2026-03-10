@@ -28,6 +28,14 @@ export default class Sea
             folder.add(this.material.uniforms.uBigWavesFrequency.value, 'x', 0, 10, 0.01).name('Freq X');
             folder.add(this.material.uniforms.uBigWavesFrequency.value, 'y', 0, 10, 0.01).name('Freq Z');
             folder.add(this.material.uniforms.uBigWavesSpeed, 'value', 0, 4, 0.01).name('Speed');
+            folder.add(this.material.uniforms.uBigWavesSteepness, 'value', 0, 1, 0.01).name('Steepness');
+
+            const colorFolder = this.debug.getFolder('World/Sea/Colors');
+
+            colorFolder.addColor(this.material.uniforms.uDepthColor, 'value').name('Depth Color');
+            colorFolder.addColor(this.material.uniforms.uSurfaceColor, 'value').name('Surface Color');
+            colorFolder.add(this.material.uniforms.uColorOffset, 'value', 0, 1, 0.001).name('Offset');
+            colorFolder.add(this.material.uniforms.uColorMultiplier, 'value', 0, 10, 0.001).name('Multiplier');
         }
     }
 
@@ -43,9 +51,15 @@ export default class Sea
                 uTime: { value: 0 },
                 uBigWavesElevation: { value: 0.2 },
                 uBigWavesFrequency: { value: new THREE.Vector2(4, 1.5) }, // X e Z
-                uBigWavesSpeed: { value: 0.75 }
+                uBigWavesSpeed: { value: 0.75 },
+                uBigWavesSteepness: { value: 0.5 },
+
+                uDepthColor: { value: new THREE.Color('#1e3f5a') },
+                uSurfaceColor: { value: new THREE.Color('#4d9aaa') },
+                uColorOffset: { value: 0.08 },
+                uColorMultiplier: { value: 5.0 }
             },
-            wireframe: true 
+            wireframe: false 
         });
     }
 
