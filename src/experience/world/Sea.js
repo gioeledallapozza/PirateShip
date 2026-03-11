@@ -25,8 +25,7 @@ export default class Sea
             const folder = this.debug.getFolder('World/Sea/Big Waves');
             
             folder.add(this.material.uniforms.uBigWavesElevation, 'value', 0, 1, 0.01).name('Elevation');
-            folder.add(this.material.uniforms.uBigWavesFrequency.value, 'x', 0, 10, 0.01).name('Freq X');
-            folder.add(this.material.uniforms.uBigWavesFrequency.value, 'y', 0, 10, 0.01).name('Freq Z');
+            folder.add(this.material.uniforms.uBigWavesFrequency, 'value', 0, 10, 0.01).name('Freq');
             folder.add(this.material.uniforms.uBigWavesSpeed, 'value', 0, 4, 0.01).name('Speed');
             folder.add(this.material.uniforms.uBigWavesSteepness, 'value', 0, 1, 0.01).name('Steepness');
 
@@ -40,7 +39,7 @@ export default class Sea
     }
 
     setGeometry(){
-        this.geometry = new THREE.PlaneGeometry(20, 20, 128, 128);
+        this.geometry = new THREE.PlaneGeometry(20, 20, 256, 256);
     }
 
     setMaterial(){
@@ -50,7 +49,7 @@ export default class Sea
             uniforms: {
                 uTime: { value: 0 },
                 uBigWavesElevation: { value: 0.2 },
-                uBigWavesFrequency: { value: new THREE.Vector2(4, 1.5) }, // X e Z
+                uBigWavesFrequency: { value: 4.0 },
                 uBigWavesSpeed: { value: 0.75 },
                 uBigWavesSteepness: { value: 0.5 },
 

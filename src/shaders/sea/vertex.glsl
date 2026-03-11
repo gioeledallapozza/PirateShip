@@ -1,50 +1,84 @@
 uniform float uTime;
 uniform float uBigWavesElevation;
-uniform vec2 uBigWavesFrequency;
+uniform float uBigWavesFrequency;
 uniform float uBigWavesSpeed;
 uniform float uBigWavesSteepness;
 
 varying float vElevation;
+varying vec3 vNormal;
+varying vec3 vWorldPosition;
 
-vec3 getGerstnerWave(vec3 position, vec2 direction, float steepness, float elevation, float frequency, float speed) {
-    
-    // Normalize direction
+void applyGerstnerWave(
+    inout vec3 position, 
+    inout vec3 tangent, 
+    inout vec3 bitangent,
+    vec2 direction, 
+    float steepness, 
+    float elevation, 
+    float frequency, 
+    float speed
+) {
     vec2 d = normalize(direction);
-    
-    // Calculate Phase
-    float wavePhase = (dot(d, position.xz) * frequency) + (uTime * speed);
+    float phase = (dot(d, position.xz) * frequency) + (uTime * speed);
 
-    // Calculate Lateral Movement
-    float x = d.x * (steepness * elevation * cos(wavePhase));
-    float z = d.y * (steepness * elevation * cos(wavePhase));
-    float y = elevation * sin(wavePhase);
+    float s = sin(phase);
+    float c = cos(phase);
 
-    return vec3(x, y, z);
+    // Horizontal (X, Z) and vertical movement (Y)
+    float horizontalOffset = steepness * elevation * c;
+    float verticalOffset = elevation * s;
+
+    position.x += d.x * horizontalOffset; //P.x
+    position.z += d.y * horizontalOffset; //P.z
+    position.y += verticalOffset;         //P.y
+
+    //Calculate common parts for the derivates
+    float commonFactor = steepness * elevation * frequency * s;
+    float slopeFactor  = elevation * frequency * c;
+
+    // Calculate tanget (derivate partial regard X), partial derivate depens from multiple varibales
+    tangent += vec3(
+        -d.x * d.x * commonFactor, // Derivate P.x regard x
+         d.x * slopeFactor,        // Derivate P.y regard x
+        -d.x * d.y * commonFactor  // Derivate P.z regard x
+    );
+
+    // Calculate Bitangent (derivate partial regard z), partial derivate depens from multiple varibales
+    bitangent += vec3(
+        -d.x * d.y * commonFactor, // Derivate di P.x regard z
+         d.y * slopeFactor,        // Derivate di P.y regard z
+        -d.y * d.y * commonFactor  // Derivate di P.z regard z
+    );
 }
 
 void main() {
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
-    //Create a copy to pass it as varibale
+
+    //Create a copy to modified it
     vec3 currentPos = modelPosition.xyz;
 
-    //Master wave
-   currentPos += getGerstnerWave(
-        modelPosition.xyz, 
-        vec2(1.0, 1.0),       // Direzione
-        uBigWavesSteepness,   // Steepness da Uniform
-        uBigWavesElevation,   // Altezza da Uniform
-        uBigWavesFrequency.x, // Frequenza da Uniform
-        uBigWavesSpeed        // Velocità da Uniform
+    //Default Normals
+    vec3 tangent = vec3(1.0, 0.0, 0.0); //X
+    vec3 bitangent = vec3(0.0, 0.0, 1.0); //Z
+
+    //Wave 1
+    applyGerstnerWave(
+        currentPos, tangent, bitangent,
+        vec2(1.0, 1.0), 
+        uBigWavesSteepness, 
+        uBigWavesElevation, 
+        uBigWavesFrequency, 
+        uBigWavesSpeed
     );
 
-    //Reflected Wave
-   currentPos += getGerstnerWave(
-        modelPosition.xyz, 
-        vec2(-0.8, 0.2),              // Direzione diversa
-        uBigWavesSteepness * 0.5,     // Meno ripida
-        uBigWavesElevation * 0.3,     // Più bassa
-        uBigWavesFrequency.x * 2.5,   // Più fitta (frequenza alta)
-        uBigWavesSpeed * 1.5          // Più veloce
+    //Wave 2
+    applyGerstnerWave(
+        currentPos, tangent, bitangent,
+        vec2(-1.0, 1.0), 
+        uBigWavesSteepness * 0.5, 
+        uBigWavesElevation * 0.3, 
+        uBigWavesFrequency * 2.5, 
+        uBigWavesSpeed * 1.5
     );
 
     modelPosition.xyz = currentPos;
@@ -56,4 +90,6 @@ void main() {
 
     //Varyings
     vElevation = currentPos.y;
+    vNormal = normalize(cross(tangent, bitangent)); //Prodotto Vettoriale
+    vWorldPosition = modelPosition.xyz;
 }
