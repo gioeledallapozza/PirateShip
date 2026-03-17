@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import Debug from '../utils/Debug.js';
+import Statistic from '../utils/Statistic.js'
 import Sizes from '../utils/Sizes.js';
 import Time from '../utils/Time.js';
 import Camera from './Camera.js'; 
@@ -19,6 +20,7 @@ export default class Experience {
 
         // Setup
         this.debug = new Debug();
+        this.statistics = new Statistic();
         this.sizes = new Sizes();
         this.time = new Time();
         this.scene = new THREE.Scene();
@@ -45,6 +47,7 @@ export default class Experience {
     }
 
     update() {
+        this.statistics.begin()
         this.camera.update()
 
         if (this.world && this.world.sea) {
@@ -52,5 +55,6 @@ export default class Experience {
         }
 
         this.renderer.update()
+        this.statistics.end()
     }
 }
