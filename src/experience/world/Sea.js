@@ -10,7 +10,7 @@ export default class Sea
         this.experience = new Experience();
         this.debug = this.experience.debug;
         this.scene = this.experience.scene;
-        // this.resources = this.experience.resources
+        this.resources = this.experience.resources;
 
         this.setGeometry();
         this.setMaterial();
@@ -94,7 +94,9 @@ export default class Sea
                 uDepthColor: new THREE.Uniform(new THREE.Color('#1e3f5a')),
                 uSurfaceColor: new THREE.Uniform(new THREE.Color('#4d9aaa')),
                 uColorOffset: new THREE.Uniform(0.08),
-                uColorMultiplier: new THREE.Uniform(5.0)
+                uColorMultiplier: new THREE.Uniform(5.0),
+                //NormalMap
+                uNormalMap: new THREE.Uniform(this.resources.items.waterNormal),
             },
             wireframe: false 
         });

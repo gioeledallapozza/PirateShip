@@ -12,16 +12,7 @@ export default class Environment
         //Debug
         this.debugFolder = this.debug.getFolder('World/Environment');
 
-
         // this.setSunLight()
         // this.setEnvironmentMap()
-
-        //Light basic  (test)
-        this.sunLight = new THREE.DirectionalLight('#ffffff', 4)
-        this.sunLight.position.set(3, 5, 5)
-        this.scene.add(this.sunLight)
-
-        this.ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
-        this.scene.add(this.ambientLight);
     }
 }

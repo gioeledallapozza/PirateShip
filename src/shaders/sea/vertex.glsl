@@ -5,7 +5,10 @@ uniform BigWave uBigWaves[4];
 
 varying float vElevation;
 varying vec3 vNormal;
+varying vec3 vTangent; 
+varying vec3 vBitangent;
 varying vec3 vWorldPosition;
+varying vec2 vUv;
 
 #include ../includes/getGerstnerWave.glsl
 
@@ -26,7 +29,8 @@ void main() {
             uBigWaves[i].steepness, 
             uBigWaves[i].elevation, 
             uBigWaves[i].frequency, 
-            uBigWaves[i].speed
+            uBigWaves[i].speed,
+            float(i)
         );
         
         finalOffset += result.positionOffset;
@@ -34,6 +38,7 @@ void main() {
         finalBitangent += result.bitangentContribution;
     }
 
+   
     currentPos += finalOffset;
     modelPosition.xyz = currentPos;
 
@@ -45,5 +50,8 @@ void main() {
     //Varyings
     vElevation = currentPos.y;
     vNormal = normalize(cross(finalTangent, finalBitangent)); //Prodotto Vettoriale
+    vTangent = finalTangent;
+    vBitangent = finalBitangent;
     vWorldPosition = modelPosition.xyz;
+    vUv = uv;
 }

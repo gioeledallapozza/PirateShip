@@ -5,7 +5,7 @@ import Sea from "./Sea.js";
 
 
 export default class World{
-     constructor() {
+    constructor() {
         this.experience = new Experience();
         this.debug = this.experience.debug;
         this.scene = this.experience.scene;
@@ -14,20 +14,17 @@ export default class World{
         //Debug
         this.debugFolder = this.debug.getFolder('World');
 
-        // Setup
-        this.sea = new Sea();
-        this.Environment = new Environment();
-
-        
-
-        // All resources ready?
-        // this.resources.on('ready', () => {
-        //     //Setup
-
-        //     this.environment = new Environment();
-        // })
+        // Event Manager
+        this.resources.on('ready', () => {
+            this.sea = new Sea();
+            this.environment = new Environment();
+        })
     }
 
 
-     
+    update() {
+        if (this.sea) {
+            this.sea.update();
+        }
+    }
 }

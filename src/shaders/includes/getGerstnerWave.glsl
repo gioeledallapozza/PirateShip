@@ -12,13 +12,14 @@ WaveResult getGerstnerWave(
     float steepness, 
     float elevation, 
     float frequency, 
-    float speed
+    float speed,
+    float waveIndex
 ) {
     WaveResult result;
     vec2 d = normalize(direction);
 
     // Il noise "sbalza" la fase rendendo le linee non dritte
-    float noise = snoise(position.xz * 0.2);
+    float noise = snoise(position.xz * 0.2 + waveIndex * 10.0);
     float phase = (dot(d, position.xz) * frequency) + (uTime * speed) + (noise * 1.5);
 
     float s = sin(phase);
