@@ -46,7 +46,7 @@ export default class Resources extends EventEmitter
     }
 
     sourceLoaded(source, file){
-       if (source.name === 'waterNormal') {
+       if (source.name === 'waterNormal' || source.name === 'foamTexture' ) {
             file.wrapS = THREE.RepeatWrapping
             file.wrapT = THREE.RepeatWrapping
         }

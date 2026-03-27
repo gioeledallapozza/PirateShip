@@ -9,6 +9,7 @@ varying vec3 vTangent;
 varying vec3 vBitangent;
 varying vec3 vWorldPosition;
 varying vec2 vUv;
+varying float vFoam;
 
 #include ../includes/getGerstnerWave.glsl
 
@@ -21,6 +22,7 @@ void main() {
     vec3 finalOffset = vec3(0.0);
     vec3 finalTangent = vec3(1.0, 0.0, 0.0);
     vec3 finalBitangent = vec3(0.0, 0.0, 1.0);
+    float cumulativeSteepness = 0.0;
 
     for(int i = 0; i < 3; i++) {
         WaveResult result = getGerstnerWave(
@@ -36,9 +38,9 @@ void main() {
         finalOffset += result.positionOffset;
         finalTangent += result.tangentContribution;
         finalBitangent += result.bitangentContribution;
+        cumulativeSteepness += result.steepnessFactor;
     }
 
-   
     currentPos += finalOffset;
     modelPosition.xyz = currentPos;
 
@@ -54,4 +56,5 @@ void main() {
     vBitangent = finalBitangent;
     vWorldPosition = modelPosition.xyz;
     vUv = uv;
+    vFoam = smoothstep(0.2, 0.4, cumulativeSteepness);
 }

@@ -3,6 +3,7 @@ import Experience from '../Experience.js';
 
 import seaFragmentShader from '../../shaders/sea/fragment.glsl';
 import seaVertexShader from '../../shaders/sea/vertex.glsl';
+import { ThreeMFLoader } from 'three/examples/jsm/Addons.js';
 
 export default class Sea 
 {
@@ -87,12 +88,12 @@ export default class Sea
                 //BigWave
                 uBigWaves: new THREE.Uniform(this.BigWaveData),
                 //Light & view
-                uLightDirection: new THREE.Uniform(new THREE.Vector3(1, 1, 0.5)), // Direzione del sole
-                uSkyColor: new THREE.Uniform(new THREE.Color('#ccf1ff')),        // Riflesso azzurro chiaro
-                uSpecularIntensity: new THREE.Uniform(0.5),                      // Forza del riflesso
-                uSpecularPower: new THREE.Uniform(30.0),                         // Durezza del riflesso
-                uFresnelPower: new THREE.Uniform(3.0),                           // Curva Fresnel
-                uFresnelIntensity: new THREE.Uniform(0.2),
+                uLightDirection: new THREE.Uniform(new THREE.Vector3(1.0, 0.9, -5.2).normalize()), 
+                uSkyColor: new THREE.Uniform(new THREE.Color('#ccf1ff')),
+                uSpecularIntensity: new THREE.Uniform(0.53),
+                uSpecularPower: new THREE.Uniform(200.0),
+                uFresnelPower: new THREE.Uniform(7.2), 
+                uFresnelIntensity: new THREE.Uniform(0.27),
                 //Color
                 uDepthColor: new THREE.Uniform(new THREE.Color('#1e3f5a')),
                 uSurfaceColor: new THREE.Uniform(new THREE.Color('#4d9aaa')),
@@ -100,8 +101,10 @@ export default class Sea
                 uColorMultiplier: new THREE.Uniform(5.0),
                 //NormalMap
                 uNormalMap: new THREE.Uniform(this.resources.items.waterNormal),
-                uNormalScale: new THREE.Uniform(15.0),
+                uNormalScale: new THREE.Uniform(2.0),
                 uNormalSpeed: new THREE.Uniform(0.02),
+                //Foam
+                uFoamColorMap: new THREE.Uniform(this.resources.items.foamTexture),
             },
             wireframe: false 
         });
@@ -110,28 +113,28 @@ export default class Sea
     setWaves(){
       this.BigWaveData = [
             // 1. L'ONDA DOMINANTE: Più grande e più lenta, decide la direzione del mare
-            { 
-                direction: new THREE.Vector2(1.0, 0.2), 
-                steepness: 0.2,   // Leggermente più ripida delle altre
-                elevation: 0.15,  // È lei che comanda l'altezza
-                frequency: 6.0,   // Un po' più larga per dare respiro
-                speed: 0.8 
+           { 
+                direction: new THREE.Vector2(1.0, 0.5).normalize(), // Direzione diagonale "sporca"
+                steepness: 0.4,   // Abbastanza ripida per la schiuma
+                elevation: 0.4,   // Alza il volume del mare
+                frequency: 0.4,   // Circa 1.2 creste in tutto il piano da 20m
+                speed: 1.2 
             },
-            // 2. L'ONDA DI DISTURBO: Più fitta e veloce, "rompe" l'onda principale
+            // 2. L'ONDA DI CONTRASTO (Più corta, rompe il ritmo)
             { 
-                direction: new THREE.Vector2(0.4, 0.7), 
-                steepness: 0.1, 
-                elevation: 0.04, 
-                frequency: 15.0,  // Molto fitta
-                speed: 1.5 
+                direction: new THREE.Vector2(-0.8, 0.3).normalize(), 
+                steepness: 0.3, 
+                elevation: 0.15, 
+                frequency: 1.1,  // Numero non multiplo della prima
+                speed: 1.8 
             },
-            // 3. IL RUMORE: Piccolissime e quasi casuali
+            // 3. IL DETTAGLIO (Onde di vento superficiali)
             { 
-                direction: new THREE.Vector2(-0.5, 0.3), 
-                steepness: 0.05, 
-                elevation: 0.02, 
-                frequency: 25.0, 
-                speed: 2.0 
+                direction: new THREE.Vector2(0.1, 1.0).normalize(), 
+                steepness: 0.2, 
+                elevation: 0.05, 
+                frequency: 2.7, 
+                speed: 2.5 
             }
         ];
     }

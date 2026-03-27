@@ -10,7 +10,7 @@ export default class Camera {
 
         // Camera position based on sections
         this.config = {
-            hero: { x: 0, y: 3, z: 12 },
+            hero: { x: 0, y: 9, z: 24 },
             immersive: { x: 0, y: 5, z: 20 },
             lookAt: { x: 0, y: 0, z: 0 }
         };

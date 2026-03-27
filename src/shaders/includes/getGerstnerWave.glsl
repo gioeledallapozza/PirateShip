@@ -4,6 +4,7 @@ struct WaveResult {
     vec3 positionOffset;
     vec3 tangentContribution;
     vec3 bitangentContribution;
+    float steepnessFactor;
 };
 
 WaveResult getGerstnerWave(
@@ -18,9 +19,8 @@ WaveResult getGerstnerWave(
     WaveResult result;
     vec2 d = normalize(direction);
 
-    // Il noise "sbalza" la fase rendendo le linee non dritte
-    float noise = snoise(position.xz * 0.2 + waveIndex * 10.0);
-    float phase = (dot(d, position.xz) * frequency) + (uTime * speed) + (noise * 1.5);
+    float noise = snoise(position.xz * 0.2 + waveIndex * 6.0);
+    float phase = (dot(d, position.xz) * frequency) + (uTime * speed) + (noise * 2.5);
 
     float s = sin(phase);
     float c = cos(phase);
@@ -41,14 +41,17 @@ WaveResult getGerstnerWave(
     float f_s = steepness * elevation * frequency * s; // Fattore per la parte orizzontale
     float f_c = elevation * frequency * c;             // Fattore per la parte verticale
 
-    // Contributo alla Tangente (variazione rispetto a X)
+    // Foam
+    result.steepnessFactor = steepness * s; //più ripida è l'onda più schiuma genera
+
+    // Tangent (X)
     result.tangentContribution = vec3(
         - (d.x * d.x * f_s),
         d.x * f_c,
         - (d.x * d.y * f_s)
     );
 
-    // Contributo alla Bitangente (variazione rispetto a Z)
+    // Bitangent (Z)
     result.bitangentContribution = vec3(
         - (d.x * d.y * f_s),
         d.y * f_c,
