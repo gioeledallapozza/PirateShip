@@ -22,7 +22,7 @@ void main() {
     vec3 finalTangent = vec3(1.0, 0.0, 0.0);
     vec3 finalBitangent = vec3(0.0, 0.0, 1.0);
 
-    for(int i = 0; i < 4; i++) {
+    for(int i = 0; i < 3; i++) {
         WaveResult result = getGerstnerWave(
             currentPos, 
             uBigWaves[i].direction, 

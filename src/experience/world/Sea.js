@@ -23,8 +23,6 @@ export default class Sea
     setDebug() {
         if(this.debug.active) {
             //Big Waves
-            const bigWavesFolder = this.debug.getFolder('World/Sea/Big Waves');
-
             this.BigWaveData.forEach((wave, index) => {
                 const folder = this.debug.getFolder(`World/Sea/Big Waves/Wave ${index + 1}`);
                 
@@ -43,6 +41,11 @@ export default class Sea
 
             //Small Waves
             const smallWavesFolder = this.debug.getFolder('World/Sea/Big Waves');
+
+            // Normal Mapping
+            const normalFolder = this.debug.getFolder('World/Sea/Normal');
+            normalFolder.add(this.material.uniforms.uNormalScale, 'value', 1, 100, 0.1).name('Normal Scale');
+            normalFolder.add(this.material.uniforms.uNormalSpeed, 'value', 0, 0.5, 0.001).name('Normal Speed');
 
             //Light & view
             const lightViewFolder = this.debug.getFolder('World/Sea/Light & View');
@@ -97,24 +100,38 @@ export default class Sea
                 uColorMultiplier: new THREE.Uniform(5.0),
                 //NormalMap
                 uNormalMap: new THREE.Uniform(this.resources.items.waterNormal),
+                uNormalScale: new THREE.Uniform(15.0),
+                uNormalSpeed: new THREE.Uniform(0.02),
             },
             wireframe: false 
         });
     }
 
     setWaves(){
-        this.BigWaveData = [
+      this.BigWaveData = [
+            // 1. L'ONDA DOMINANTE: Più grande e più lenta, decide la direzione del mare
             { 
-                direction: new THREE.Vector2(1.0, 0.2), steepness: 0.5, elevation: 0.2, frequency: 4.0, speed: 0.75 
+                direction: new THREE.Vector2(1.0, 0.2), 
+                steepness: 0.2,   // Leggermente più ripida delle altre
+                elevation: 0.15,  // È lei che comanda l'altezza
+                frequency: 6.0,   // Un po' più larga per dare respiro
+                speed: 0.8 
             },
+            // 2. L'ONDA DI DISTURBO: Più fitta e veloce, "rompe" l'onda principale
             { 
-                direction: new THREE.Vector2(-0.7, 0.9), steepness: 0.25, elevation: 0.08, frequency: 8.4, speed: 0.9 
+                direction: new THREE.Vector2(0.4, 0.7), 
+                steepness: 0.1, 
+                elevation: 0.04, 
+                frequency: 15.0,  // Molto fitta
+                speed: 1.5 
             },
+            // 3. IL RUMORE: Piccolissime e quasi casuali
             { 
-                direction: new THREE.Vector2(0.3, -1.0), steepness: 0.15, elevation: 0.04, frequency: 18.0, speed: 1.35 
-            },
-            { 
-                direction: new THREE.Vector2(-0.1, -0.8), steepness: 0.1, elevation: 0.02, frequency: 32.0, speed: 1.87 
+                direction: new THREE.Vector2(-0.5, 0.3), 
+                steepness: 0.05, 
+                elevation: 0.02, 
+                frequency: 25.0, 
+                speed: 2.0 
             }
         ];
     }
