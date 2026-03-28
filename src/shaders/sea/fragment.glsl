@@ -16,6 +16,19 @@ uniform float uNormalScale;
 uniform float uNormalSpeed;
 
 uniform sampler2D uFoamColorMap;
+uniform vec2 uFoamScale;
+uniform float uFoamSpeed;
+uniform sampler2D uFoamNormalMap;
+uniform vec2 uFoamThreshold;
+uniform float uFoamTextureIntensity; 
+uniform float uFoamModulation;
+uniform float uFoamNormalIntensity;
+uniform vec3 uFoamColor;
+
+uniform vec3 uSSSColor;
+uniform float uSSSIntensity;            
+uniform float uSSSPower;              
+uniform float uSSSDepth;  
 
 varying float vElevation;
 varying vec3 vNormal;
@@ -32,9 +45,6 @@ void main() {
     vec3 normal = normalize(vNormal);
     vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
     vec3 lightDirection = normalize(uLightDirection); 
-    
-    vec2 uFoamScale = vec2(0.05, 0.02);
-    float uFoamSpeed = 0.01;
     vec2 worldUv = vWorldPosition.xz;
 
     // Depth Colour
@@ -56,14 +66,16 @@ void main() {
     normal = normalize(tbn * mixedNormalMap);
     
     //Foam
-    vec2 foamUv1 = worldUv * uFoamScale.x + vec2(uTime * uFoamSpeed, uTime * uFoamSpeed * 0.5);
-    float foamSample1 = texture2D(uFoamColorMap, foamUv1).r;
-    vec2 foamUv2 = worldUv * uFoamScale.y + vec2(uTime * uFoamSpeed * -1.5, uTime * uFoamSpeed * 0.2);
-    float foamSample2 = texture2D(uFoamColorMap, foamUv2).r;
-    float finalFoamTexture = foamSample1 * foamSample2;
-    float sharpenedFoamMask = smoothstep(0.1, 0.3, vFoam);
-    float finalFoamIntensity = sharpenedFoamMask * finalFoamTexture;
-    vec3 foamColor = vec3(1.0, 1.0, 1.0);
+    vec2 foamUv1 = worldUv * uFoamScale.x + vec2(uTime * uFoamSpeed, uTime * uFoamSpeed);
+    vec2 foamUv2 = worldUv * uFoamScale.y + vec2(uTime * uFoamSpeed * -1.5, uTime * uFoamSpeed * 0.9);
+    float foamTexture1 = texture2D(uFoamColorMap, foamUv1).r;
+    float foamTexture2 = texture2D(uFoamColorMap, foamUv2).r;
+    float combinedTexture = foamTexture1 * foamTexture2 * uFoamTextureIntensity;
+    float foamErosion = smoothstep(uFoamThreshold.x, uFoamThreshold.y, combinedTexture + (vFoam * uFoamModulation));
+    float foamStrength = foamErosion * combinedTexture;
+    vec3 foamNormal = texture2D(uFoamNormalMap, foamUv1).rgb * 2.0 - 1.0;
+    normal = normalize(mix(normal, tbn * foamNormal, foamStrength * uFoamNormalIntensity));
+    vec3 foamColor = uFoamColor;
 
     //Diffuse light
     float diffuse = max(0.0, dot(normal, lightDirection)); //dot return 0 when perpendicular 1 if parallel -1 if behind
@@ -84,11 +96,11 @@ void main() {
     finalColor += specular * uSpecularIntensity;
 
     // Subsurface scattering
-    vec3 sssColor = vec3(0.0, 1.0, 0.5);
     float sssInversion = max(0.0, dot(viewDirection, -lightDirection));
-    float sssIntensity = pow(sssInversion, 4.0); 
-    float waveThinness = smoothstep(0.0, 0.35, vElevation); 
-    vec3 sssGlow = sssColor * sssIntensity * waveThinness * 0.5;
+    float sssFactor = pow(sssInversion, uSSSPower); 
+    float waveThinness = smoothstep(0.0, uSSSDepth, vElevation); 
+    vec3 sssGlow = uSSSColor * sssFactor * waveThinness * uSSSIntensity;
+    sssGlow *= (1.0 - foamStrength * 0.5);
     finalColor += sssGlow;
 
     // Sky
@@ -96,7 +108,9 @@ void main() {
 
     //Foam
     foamColor += finalColor;
-    finalColor = mix(finalColor, foamColor, finalFoamIntensity);
+    finalColor = mix(finalColor, foamColor, foamStrength);
+    vec3 litFoamColor = foamColor * (diffuse * 0.5 + 0.5);
+    finalColor = mix(finalColor, litFoamColor, foamStrength);
 
     gl_FragColor = vec4(finalColor, 1.0);
 }

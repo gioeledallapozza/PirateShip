@@ -4,6 +4,7 @@ import Experience from '../Experience.js';
 import seaFragmentShader from '../../shaders/sea/fragment.glsl';
 import seaVertexShader from '../../shaders/sea/vertex.glsl';
 import { ThreeMFLoader } from 'three/examples/jsm/Addons.js';
+import { vec2 } from 'three/tsl';
 
 export default class Sea 
 {
@@ -48,6 +49,18 @@ export default class Sea
             normalFolder.add(this.material.uniforms.uNormalScale, 'value', 1, 100, 0.1).name('Normal Scale');
             normalFolder.add(this.material.uniforms.uNormalSpeed, 'value', 0, 0.5, 0.001).name('Normal Speed');
 
+            //Foam
+            const foamFolder = this.debug.getFolder('World/Sea/Foam');
+            foamFolder.add(this.material.uniforms.uFoamScale.value, 'x').name('Scale X').min(0).max(0.2).step(0.001);
+            foamFolder.add(this.material.uniforms.uFoamScale.value, 'y').name('Scale Y').min(0).max(0.2).step(0.001);
+            foamFolder.add(this.material.uniforms.uFoamSpeed, 'value').name('Speed').min(0).max(0.5).step(0.001);
+            foamFolder.add(this.material.uniforms.uFoamThreshold.value, 'x').name('Erosion Min').min(0).max(1).step(0.01);
+            foamFolder.add(this.material.uniforms.uFoamThreshold.value, 'y').name('Erosion Max').min(0).max(1).step(0.01);
+            foamFolder.add(this.material.uniforms.uFoamTextureIntensity, 'value').name('Tex Intensity').min(0).max(5).step(0.1);
+            foamFolder.add(this.material.uniforms.uFoamModulation, 'value').name('Wave Modulation').min(0).max(3).step(0.1);
+            foamFolder.add(this.material.uniforms.uFoamNormalIntensity, 'value').name('Normal Strength').min(0).max(10).step(0.1);
+            foamFolder.addColor(this.material.uniforms.uFoamColor, 'value').name('Foam Color');
+                
             //Light & view
             const lightViewFolder = this.debug.getFolder('World/Sea/Light & View');
 
@@ -55,16 +68,21 @@ export default class Sea
             lightViewFolder.add(this.material.uniforms.uLightDirection.value, 'x', -10, 10, 0.1).name('Light X');
             lightViewFolder.add(this.material.uniforms.uLightDirection.value, 'y', -10, 10, 0.1).name('Light Y');
             lightViewFolder.add(this.material.uniforms.uLightDirection.value, 'z', -10, 10, 0.1).name('Light Z');
-
-            // View (Specular & Fresnel)
+            lightViewFolder.addColor(this.material.uniforms.uSkyColor, 'value').name('Sky Color')
             lightViewFolder.add(this.material.uniforms.uSpecularIntensity, 'value', 0, 2, 0.01).name('Spec Intensity');
             lightViewFolder.add(this.material.uniforms.uSpecularPower, 'value', 1, 200, 1).name('Spec Power');
             lightViewFolder.add(this.material.uniforms.uFresnelPower, 'value', 0.1, 10, 0.1).name('Fresnel Power');
             lightViewFolder.add(this.material.uniforms.uFresnelIntensity, 'value', 0, 1, 0.01).name('Fresnel Intensity');
 
+            //Subsurface Scattering
+            const sssFolder = this.debug.getFolder('World/Sea/SSS');
+            sssFolder.addColor(this.material.uniforms.uSSSColor, 'value').name('Color');
+            sssFolder.add(this.material.uniforms.uSSSIntensity, 'value', 0, 5, 0.1).name('Intensity');
+            sssFolder.add(this.material.uniforms.uSSSPower, 'value', 1, 20, 1).name('Power');
+            sssFolder.add(this.material.uniforms.uSSSDepth, 'value', -1, 1, 0.01).name('Depth Mask');
+
             //Colors
             const colorFolder = this.debug.getFolder('World/Sea/Colors');
-
             colorFolder.addColor(this.material.uniforms.uDepthColor, 'value').name('Depth Color');
             colorFolder.addColor(this.material.uniforms.uSurfaceColor, 'value').name('Surface Color');
             colorFolder.add(this.material.uniforms.uColorOffset, 'value', 0, 1, 0.001).name('Offset');
@@ -73,7 +91,7 @@ export default class Sea
     }
 
     setGeometry(){
-        this.geometry = new THREE.PlaneGeometry(20, 20, 256, 256);
+        this.geometry = new THREE.PlaneGeometry(30, 30, 128, 128);
     }
 
     setMaterial(){
@@ -97,7 +115,7 @@ export default class Sea
                 //Color
                 uDepthColor: new THREE.Uniform(new THREE.Color('#1e3f5a')),
                 uSurfaceColor: new THREE.Uniform(new THREE.Color('#4d9aaa')),
-                uColorOffset: new THREE.Uniform(0.08),
+                uColorOffset: new THREE.Uniform(0.35),
                 uColorMultiplier: new THREE.Uniform(5.0),
                 //NormalMap
                 uNormalMap: new THREE.Uniform(this.resources.items.waterNormal),
@@ -105,6 +123,19 @@ export default class Sea
                 uNormalSpeed: new THREE.Uniform(0.02),
                 //Foam
                 uFoamColorMap: new THREE.Uniform(this.resources.items.foamTexture),
+                uFoamScale: new THREE.Uniform(new THREE.Vector2(0.05, 0.02)),
+                uFoamSpeed: new THREE.Uniform(0.01),
+                uFoamNormalMap: new THREE.Uniform(this.resources.items.foamNormal),
+                uFoamThreshold: new THREE.Uniform(new THREE.Vector2(0.2, 1.0)), 
+                uFoamTextureIntensity: new THREE.Uniform(0.8),
+                uFoamModulation: new THREE.Uniform(1.0), 
+                uFoamNormalIntensity: new THREE.Uniform(0.2),
+                uFoamColor: new THREE.Uniform(new THREE.Color('#e6ffff')),
+                //Subsurface Scattering
+                uSSSColor: new THREE.Uniform(new THREE.Color('#00ff80')),
+                uSSSIntensity: new THREE.Uniform(0.5),              
+                uSSSPower: new THREE.Uniform(4.0),                    
+                uSSSDepth: new THREE.Uniform(0.35)                    
             },
             wireframe: false 
         });
