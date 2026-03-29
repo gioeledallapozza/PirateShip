@@ -2,7 +2,8 @@ uniform float uTime;
 uniform vec3 uLightDirection;      
 uniform vec3 uSkyColor;           
 uniform float uSpecularIntensity; 
-uniform float uSpecularPower;      
+uniform float uSpecularPower;   
+uniform vec3 uSpecularColor;   
 uniform float uFresnelPower;      
 uniform float uFresnelIntensity;   
 
@@ -93,7 +94,7 @@ void main() {
     vec3 finalColor = baseColor * (diffuse * 0.5 + 0.5);
     
     // Reflexs
-    finalColor += specular * uSpecularIntensity;
+    finalColor += specular * uSpecularIntensity * uSpecularColor;
 
     // Subsurface scattering
     float sssInversion = max(0.0, dot(viewDirection, -lightDirection));
@@ -109,7 +110,7 @@ void main() {
     //Foam
     foamColor += finalColor;
     finalColor = mix(finalColor, foamColor, foamStrength);
-    vec3 litFoamColor = foamColor * (diffuse * 0.5 + 0.5);
+    vec3 litFoamColor = foamColor * (diffuse * 0.5 + 0.5) * uSpecularColor;
     finalColor = mix(finalColor, litFoamColor, foamStrength);
 
     gl_FragColor = vec4(finalColor, 1.0);

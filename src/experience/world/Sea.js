@@ -4,7 +4,7 @@ import Experience from '../Experience.js';
 import seaFragmentShader from '../../shaders/sea/fragment.glsl';
 import seaVertexShader from '../../shaders/sea/vertex.glsl';
 import { ThreeMFLoader } from 'three/examples/jsm/Addons.js';
-import { vec2 } from 'three/tsl';
+import { color, vec2 } from 'three/tsl';
 
 export default class Sea 
 {
@@ -25,6 +25,7 @@ export default class Sea
     setDebug() {
         if(this.debug.active) {
             //Big Waves
+            const bigWavesFolder = this.debug.getFolder('World/Sea/Big Waves');
             this.BigWaveData.forEach((wave, index) => {
                 const folder = this.debug.getFolder(`World/Sea/Big Waves/Wave ${index + 1}`);
                 
@@ -40,6 +41,7 @@ export default class Sea
                 // Chiude la cartella di default
                 folder.close();
             });
+            bigWavesFolder.close();
 
             //Small Waves
             const smallWavesFolder = this.debug.getFolder('World/Sea/Big Waves');
@@ -48,6 +50,7 @@ export default class Sea
             const normalFolder = this.debug.getFolder('World/Sea/Normal');
             normalFolder.add(this.material.uniforms.uNormalScale, 'value', 1, 100, 0.1).name('Normal Scale');
             normalFolder.add(this.material.uniforms.uNormalSpeed, 'value', 0, 0.5, 0.001).name('Normal Speed');
+            normalFolder.close()
 
             //Foam
             const foamFolder = this.debug.getFolder('World/Sea/Foam');
@@ -60,6 +63,7 @@ export default class Sea
             foamFolder.add(this.material.uniforms.uFoamModulation, 'value').name('Wave Modulation').min(0).max(3).step(0.1);
             foamFolder.add(this.material.uniforms.uFoamNormalIntensity, 'value').name('Normal Strength').min(0).max(10).step(0.1);
             foamFolder.addColor(this.material.uniforms.uFoamColor, 'value').name('Foam Color');
+            foamFolder.close();
                 
             //Light & view
             const lightViewFolder = this.debug.getFolder('World/Sea/Light & View');
@@ -73,6 +77,7 @@ export default class Sea
             lightViewFolder.add(this.material.uniforms.uSpecularPower, 'value', 1, 200, 1).name('Spec Power');
             lightViewFolder.add(this.material.uniforms.uFresnelPower, 'value', 0.1, 10, 0.1).name('Fresnel Power');
             lightViewFolder.add(this.material.uniforms.uFresnelIntensity, 'value', 0, 1, 0.01).name('Fresnel Intensity');
+            lightViewFolder.close();
 
             //Subsurface Scattering
             const sssFolder = this.debug.getFolder('World/Sea/SSS');
@@ -80,6 +85,7 @@ export default class Sea
             sssFolder.add(this.material.uniforms.uSSSIntensity, 'value', 0, 5, 0.1).name('Intensity');
             sssFolder.add(this.material.uniforms.uSSSPower, 'value', 1, 20, 1).name('Power');
             sssFolder.add(this.material.uniforms.uSSSDepth, 'value', -1, 1, 0.01).name('Depth Mask');
+            sssFolder.close();
 
             //Colors
             const colorFolder = this.debug.getFolder('World/Sea/Colors');
@@ -87,11 +93,12 @@ export default class Sea
             colorFolder.addColor(this.material.uniforms.uSurfaceColor, 'value').name('Surface Color');
             colorFolder.add(this.material.uniforms.uColorOffset, 'value', 0, 1, 0.001).name('Offset');
             colorFolder.add(this.material.uniforms.uColorMultiplier, 'value', 0, 10, 0.001).name('Multiplier');
+            colorFolder.close();
         }
     }
 
     setGeometry(){
-        this.geometry = new THREE.PlaneGeometry(30, 30, 128, 128);
+        this.geometry = new THREE.PlaneGeometry(300, 300, 256, 256);
     }
 
     setMaterial(){
@@ -107,14 +114,15 @@ export default class Sea
                 uBigWaves: new THREE.Uniform(this.BigWaveData),
                 //Light & view
                 uLightDirection: new THREE.Uniform(new THREE.Vector3(1.0, 0.9, -5.2).normalize()), 
-                uSkyColor: new THREE.Uniform(new THREE.Color('#ccf1ff')),
-                uSpecularIntensity: new THREE.Uniform(0.53),
+                uSkyColor: new THREE.Uniform(new THREE.Color('#ffe3d5')),
+                uSpecularIntensity: new THREE.Uniform(1.4),
                 uSpecularPower: new THREE.Uniform(200.0),
+                uSpecularColor: new THREE.Uniform(new THREE.Color('#ffe8a8')),
                 uFresnelPower: new THREE.Uniform(7.2), 
                 uFresnelIntensity: new THREE.Uniform(0.27),
                 //Color
-                uDepthColor: new THREE.Uniform(new THREE.Color('#1e3f5a')),
-                uSurfaceColor: new THREE.Uniform(new THREE.Color('#4d9aaa')),
+                uDepthColor: new THREE.Uniform(new THREE.Color('#001f4d')),
+                uSurfaceColor: new THREE.Uniform(new THREE.Color('#004d40')),
                 uColorOffset: new THREE.Uniform(0.35),
                 uColorMultiplier: new THREE.Uniform(5.0),
                 //NormalMap
@@ -134,40 +142,53 @@ export default class Sea
                 //Subsurface Scattering
                 uSSSColor: new THREE.Uniform(new THREE.Color('#00ff80')),
                 uSSSIntensity: new THREE.Uniform(0.5),              
-                uSSSPower: new THREE.Uniform(4.0),                    
-                uSSSDepth: new THREE.Uniform(0.35)                    
+                uSSSPower: new THREE.Uniform(18.0),                    
+                uSSSDepth: new THREE.Uniform(0.80)                    
             },
-            wireframe: false 
+            wireframe: false,
         });
     }
 
     setWaves(){
-      this.BigWaveData = [
-            // 1. L'ONDA DOMINANTE: Più grande e più lenta, decide la direzione del mare
-           { 
-                direction: new THREE.Vector2(1.0, 0.5).normalize(), // Direzione diagonale "sporca"
-                steepness: 0.4,   // Abbastanza ripida per la schiuma
-                elevation: 0.4,   // Alza il volume del mare
-                frequency: 0.4,   // Circa 1.2 creste in tutto il piano da 20m
-                speed: 1.2 
-            },
-            // 2. L'ONDA DI CONTRASTO (Più corta, rompe il ritmo)
-            { 
-                direction: new THREE.Vector2(-0.8, 0.3).normalize(), 
-                steepness: 0.3, 
-                elevation: 0.15, 
-                frequency: 1.1,  // Numero non multiplo della prima
-                speed: 1.8 
-            },
-            // 3. IL DETTAGLIO (Onde di vento superficiali)
-            { 
-                direction: new THREE.Vector2(0.1, 1.0).normalize(), 
-                steepness: 0.2, 
-                elevation: 0.05, 
-                frequency: 2.7, 
-                speed: 2.5 
-            }
-        ];
+        this.BigWaveData = [
+    // ONDE PORTANTI (Grandi masse d'acqua)
+    { direction: new THREE.Vector2(1.0, 0.1).normalize(), steepness: 0.5, elevation: 0.45, frequency: 0.08, speed: 0.6 },
+    { direction: new THREE.Vector2(-0.7, 0.4).normalize(), steepness: 0.7, elevation: 0.30, frequency: 0.15, speed: 0.9 },
+
+    // ONDE MEDIE (Rompono il pattern delle grandi)
+    { direction: new THREE.Vector2(0.3, 0.8).normalize(), steepness: 0.15, elevation: 0.12, frequency: 0.35, speed: 1.4 },
+    { direction: new THREE.Vector2(-0.2, -0.9).normalize(), steepness: 0.1, elevation: 0.08, frequency: 0.55, speed: 2.1 },
+
+    // MICRO-TURBOLENZA (Eliminano l'effetto plastica)
+    { direction: new THREE.Vector2(0.8, -0.5).normalize(), steepness: 0.05, elevation: 0.04, frequency: 1.2, speed: 3.5 },
+    { direction: new THREE.Vector2(-0.5, 0.1).normalize(), steepness: 0.05, elevation: 0.02, frequency: 2.5, speed: 4.2 }
+];
+    //   this.BigWaveData = [
+    //         // 1. L'ONDA DOMINANTE: Più grande e più lenta, decide la direzione del mare
+    //        { 
+    //             direction: new THREE.Vector2(1.0, 0.5).normalize(), // Direzione diagonale "sporca"
+    //             steepness: 0.4,   // Abbastanza ripida per la schiuma
+    //             elevation: 0.4,   // Alza il volume del mare
+    //             frequency: 0.4,   // Circa 1.2 creste in tutto il piano da 20m
+    //             speed: 1.2 
+    //         },
+    //         // 2. L'ONDA DI CONTRASTO (Più corta, rompe il ritmo)
+    //         { 
+    //             direction: new THREE.Vector2(-0.8, 0.3).normalize(), 
+    //             steepness: 0.3, 
+    //             elevation: 0.15, 
+    //             frequency: 1.1,  // Numero non multiplo della prima
+    //             speed: 1.8 
+    //         },
+    //         // 3. IL DETTAGLIO (Onde di vento superficiali)
+    //         { 
+    //             direction: new THREE.Vector2(0.1, 1.0).normalize(), 
+    //             steepness: 0.2, 
+    //             elevation: 0.05, 
+    //             frequency: 2.7, 
+    //             speed: 2.5 
+    //         }
+    //     ];
     }
 
     setMesh(){
