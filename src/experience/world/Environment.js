@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import Experience from '../Experience.js'
 import { Sky } from 'three/addons/objects/Sky.js'
-import { fog } from 'three/tsl'
 
 export default class Environment
 {
@@ -21,13 +20,9 @@ export default class Environment
             mieCoefficient: 0.005,
             mieDirectionalG: 0.7,
             elevation: 2,   // Angolo del sole (0 = orizzonte)
-            azimuth: 180,   // Posizione intorno al piano
+            azimuth: 160,   // Posizione intorno al piano
             exposure: 0.5
         }
-
-        //Test per visualizzare i colori della nave
-        // this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
-        // this.scene.add(this.ambientLight)
 
         this.sun = new THREE.Vector3()
 
@@ -65,13 +60,28 @@ export default class Environment
         // Update sky shader
         this.sky.material.uniforms['sunPosition'].value.copy(this.sun)
 
+        //Light for simulate the sun
+        if(!this.sunLight) {
+            this.sunLight = new THREE.DirectionalLight('#ffe3d5', 2) // Intensità 2 o più
+            this.scene.add(this.sunLight)
+        }
+
         //Copy direction of the sky To handle better
         if(this.experience.world.sea) {
             this.experience.world.sea.material.uniforms.uLightDirection.value.copy(this.sun)
         }
         
-        // Se hai una luce direzionale fisica (opzionale)
-        // this.sunLight.position.copy(this.sun)
+        this.updateEnvironmentMap()
+    }
+
+    updateEnvironmentMap() {
+        // Usa .instance se il tuo renderer è dentro un wrapper
+        const pmremGenerator = new THREE.PMREMGenerator(this.experience.renderer.instance) 
+        
+        const renderTarget = pmremGenerator.fromScene(this.sky)
+        this.scene.environment = renderTarget.texture
+        
+        pmremGenerator.dispose()
     }
 
     setDebug() {

@@ -16,9 +16,9 @@ export default class World{
 
         // Event Manager
         this.resources.on('ready', () => {
-            this.environment = new Environment();
             this.sea = new Sea();
             this.ship = new Ship();
+            this.environment = new Environment();
         })
     }
 
