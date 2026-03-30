@@ -39,6 +39,8 @@ varying vec3 vWorldPosition;
 varying vec2 vUv;
 varying float vFoam;
 
+#include <fog_pars_fragment>
+
 void main() {
 
     vec3 tangent = normalize(vTangent);
@@ -114,4 +116,6 @@ void main() {
     finalColor = mix(finalColor, litFoamColor, foamStrength);
 
     gl_FragColor = vec4(finalColor, 1.0);
+
+    #include <fog_fragment>
 }

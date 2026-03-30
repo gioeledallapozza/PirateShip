@@ -12,6 +12,7 @@ varying vec2 vUv;
 varying float vFoam;
 
 #include ../includes/getGerstnerWave.glsl
+#include <fog_pars_vertex>
 
 void main() {
 
@@ -44,8 +45,8 @@ void main() {
     currentPos += finalOffset;
     modelPosition.xyz = currentPos;
 
-    vec4 viewPosition = viewMatrix * modelPosition;
-    vec4 projectedPosition = projectionMatrix * viewPosition;
+    vec4 mvPosition = viewMatrix * modelPosition;
+    vec4 projectedPosition = projectionMatrix * mvPosition;
 
     gl_Position = projectedPosition;
 
@@ -57,4 +58,6 @@ void main() {
     vWorldPosition = modelPosition.xyz;
     vUv = uv;
     vFoam = smoothstep(0.2, 0.4, cumulativeSteepness);
+
+    #include <fog_vertex>
 }

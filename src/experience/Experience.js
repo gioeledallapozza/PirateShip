@@ -52,9 +52,7 @@ export default class Experience {
         this.statistics.begin()
         this.camera.update()
 
-        if (this.world && this.world.sea) {
-            this.world.sea.update();
-        }
+        this.world.update();
 
         this.renderer.update()
         this.statistics.end()

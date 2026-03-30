@@ -25,6 +25,10 @@ export default class Environment
             exposure: 0.5
         }
 
+        //Test per visualizzare i colori della nave
+        // this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+        // this.scene.add(this.ambientLight)
+
         this.sun = new THREE.Vector3()
 
         this.setSky()
@@ -48,7 +52,7 @@ export default class Environment
 
     setFog(){
         const fogColor = '#d8a08f'; 
-        this.scene.fog = new THREE.FogExp2(fogColor, 0.002);
+        this.scene.fog = new THREE.FogExp2(fogColor, 0.008);
     }
 
     updateSun() {
@@ -72,12 +76,17 @@ export default class Environment
 
     setDebug() {
         if(this.debug.active) {
-            const folder = this.debug.getFolder('World/Environment');
+            const skyFolder = this.debug.getFolder('World/Environment/Sky');
             
-            folder.add(this.params, 'turbidity', 0, 20).onChange(() => this.skyVariables['turbidity'].value = this.params.turbidity)
-            folder.add(this.params, 'rayleigh', 0, 4).onChange(() => this.skyVariables['rayleigh'].value = this.params.rayleigh)
-            folder.add(this.params, 'elevation', 0, 90, 0.1).name('Sun Elevation').onChange(() => this.updateSun())
-            folder.add(this.params, 'azimuth', -180, 180, 0.1).name('Sun Azimuth').onChange(() => this.updateSun())
+            skyFolder.add(this.params, 'turbidity', 0, 20).onChange(() => this.skyVariables['turbidity'].value = this.params.turbidity)
+            skyFolder.add(this.params, 'rayleigh', 0, 4).onChange(() => this.skyVariables['rayleigh'].value = this.params.rayleigh)
+            skyFolder.add(this.params, 'elevation', 0, 90, 0.1).name('Sun Elevation').onChange(() => this.updateSun())
+            skyFolder.add(this.params, 'azimuth', -180, 180, 0.1).name('Sun Azimuth').onChange(() => this.updateSun())
+
+
+            const fogFolder = this.debug.getFolder('World/Environment/Fog');
+            fogFolder.add(this.scene.fog, 'density', 0, 0.1, 0.001).name('Fog Density');
+            fogFolder.addColor(this.scene.fog, 'color').name('Fog Color');
         }
     }
 }

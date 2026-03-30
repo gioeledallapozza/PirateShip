@@ -98,7 +98,7 @@ export default class Sea
     }
 
     setGeometry(){
-        this.geometry = new THREE.PlaneGeometry(300, 300, 256, 256);
+        this.geometry = new THREE.PlaneGeometry(400, 400, 256, 256);
     }
 
     setMaterial(){
@@ -107,44 +107,48 @@ export default class Sea
         this.material = new THREE.ShaderMaterial({
             vertexShader: seaVertexShader,
             fragmentShader: seaFragmentShader,
-            uniforms: {
-                //Time
-                uTime: new THREE.Uniform(0),
-                //BigWave
-                uBigWaves: new THREE.Uniform(this.BigWaveData),
-                //Light & view
-                uLightDirection: new THREE.Uniform(new THREE.Vector3(1.0, 0.9, -5.2).normalize()), 
-                uSkyColor: new THREE.Uniform(new THREE.Color('#ffe3d5')),
-                uSpecularIntensity: new THREE.Uniform(1.4),
-                uSpecularPower: new THREE.Uniform(200.0),
-                uSpecularColor: new THREE.Uniform(new THREE.Color('#ffe8a8')),
-                uFresnelPower: new THREE.Uniform(7.2), 
-                uFresnelIntensity: new THREE.Uniform(0.27),
-                //Color
-                uDepthColor: new THREE.Uniform(new THREE.Color('#001f4d')),
-                uSurfaceColor: new THREE.Uniform(new THREE.Color('#004d40')),
-                uColorOffset: new THREE.Uniform(0.35),
-                uColorMultiplier: new THREE.Uniform(5.0),
-                //NormalMap
-                uNormalMap: new THREE.Uniform(this.resources.items.waterNormal),
-                uNormalScale: new THREE.Uniform(2.0),
-                uNormalSpeed: new THREE.Uniform(0.02),
-                //Foam
-                uFoamColorMap: new THREE.Uniform(this.resources.items.foamTexture),
-                uFoamScale: new THREE.Uniform(new THREE.Vector2(0.05, 0.02)),
-                uFoamSpeed: new THREE.Uniform(0.01),
-                uFoamNormalMap: new THREE.Uniform(this.resources.items.foamNormal),
-                uFoamThreshold: new THREE.Uniform(new THREE.Vector2(0.2, 1.0)), 
-                uFoamTextureIntensity: new THREE.Uniform(0.8),
-                uFoamModulation: new THREE.Uniform(1.0), 
-                uFoamNormalIntensity: new THREE.Uniform(0.2),
-                uFoamColor: new THREE.Uniform(new THREE.Color('#e6ffff')),
-                //Subsurface Scattering
-                uSSSColor: new THREE.Uniform(new THREE.Color('#00ff80')),
-                uSSSIntensity: new THREE.Uniform(0.5),              
-                uSSSPower: new THREE.Uniform(18.0),                    
-                uSSSDepth: new THREE.Uniform(0.80)                    
-            },
+            uniforms: THREE.UniformsUtils.merge([
+                THREE.UniformsLib['fog'],
+                {
+                    //Time
+                    uTime: new THREE.Uniform(0),
+                    //BigWave
+                    uBigWaves: new THREE.Uniform(this.BigWaveData),
+                    //Light & view
+                    uLightDirection: new THREE.Uniform(new THREE.Vector3(1.0, 0.9, -5.2).normalize()), 
+                    uSkyColor: new THREE.Uniform(new THREE.Color('#ffe3d5')),
+                    uSpecularIntensity: new THREE.Uniform(1.4),
+                    uSpecularPower: new THREE.Uniform(200.0),
+                    uSpecularColor: new THREE.Uniform(new THREE.Color('#ffe8a8')),
+                    uFresnelPower: new THREE.Uniform(7.2), 
+                    uFresnelIntensity: new THREE.Uniform(0.27),
+                    //Color
+                    uDepthColor: new THREE.Uniform(new THREE.Color('#001f4d')),
+                    uSurfaceColor: new THREE.Uniform(new THREE.Color('#004d40')),
+                    uColorOffset: new THREE.Uniform(0.35),
+                    uColorMultiplier: new THREE.Uniform(5.0),
+                    //NormalMap
+                    uNormalMap: new THREE.Uniform(this.resources.items.waterNormal),
+                    uNormalScale: new THREE.Uniform(2.0),
+                    uNormalSpeed: new THREE.Uniform(0.02),
+                    //Foam
+                    uFoamColorMap: new THREE.Uniform(this.resources.items.foamTexture),
+                    uFoamScale: new THREE.Uniform(new THREE.Vector2(0.05, 0.02)),
+                    uFoamSpeed: new THREE.Uniform(0.01),
+                    uFoamNormalMap: new THREE.Uniform(this.resources.items.foamNormal),
+                    uFoamThreshold: new THREE.Uniform(new THREE.Vector2(0.2, 1.0)), 
+                    uFoamTextureIntensity: new THREE.Uniform(0.8),
+                    uFoamModulation: new THREE.Uniform(1.0), 
+                    uFoamNormalIntensity: new THREE.Uniform(0.2),
+                    uFoamColor: new THREE.Uniform(new THREE.Color('#e6ffff')),
+                    //Subsurface Scattering
+                    uSSSColor: new THREE.Uniform(new THREE.Color('#00ff80')),
+                    uSSSIntensity: new THREE.Uniform(0.5),              
+                    uSSSPower: new THREE.Uniform(18.0),                    
+                    uSSSDepth: new THREE.Uniform(0.80)                    
+                }            
+            ]),
+            fog: true,
             wireframe: false,
         });
     }
@@ -204,7 +208,7 @@ export default class Sea
     /*
     *  Event Manager
     */
-   update(){
-    this.material.uniforms.uTime.value = this.experience.time.elapsed * 0.001;
-   }
+    update(){
+        this.material.uniforms.uTime.value = this.experience.time.elapsed * 0.001;
+    }
 }

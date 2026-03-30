@@ -2,7 +2,7 @@
 import Experience from "../Experience.js";
 import Environment from "./Environment.js";
 import Sea from "./Sea.js";
-
+import Ship from "./Ship.js";
 
 export default class World{
     constructor() {
@@ -16,15 +16,18 @@ export default class World{
 
         // Event Manager
         this.resources.on('ready', () => {
-            this.sea = new Sea();
             this.environment = new Environment();
+            this.sea = new Sea();
+            this.ship = new Ship();
         })
     }
-
 
     update() {
         if (this.sea) {
             this.sea.update();
+        }
+        if (this.ship) {
+            this.ship.update();
         }
     }
 }

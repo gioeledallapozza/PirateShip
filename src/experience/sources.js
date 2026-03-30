@@ -13,5 +13,10 @@ export default [
         name: 'foamNormal',
         type: 'texture',
         path: '/textures/water/Foam002_1K-JPG/Foam002_1K-JPG_NormalGL.jpg'
+    },
+    {
+    name: 'pirateShip',
+    type: 'gltfModel',
+    path: '/textures/PirateShip/PirateShip_Draco.glb'
     }
 ]
