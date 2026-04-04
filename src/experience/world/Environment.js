@@ -20,7 +20,7 @@ export default class Environment
             mieCoefficient: 0.005,
             mieDirectionalG: 0.7,
             elevation: 2,   // Angolo del sole (0 = orizzonte)
-            azimuth: 160,   // Posizione intorno al piano
+            azimuth: 160,   // Posizione intorno al piano  //180 (telefono)
             exposure: 0.5
         }
 

@@ -14,14 +14,18 @@ export default class Ship
         this.time = this.experience.time
         this.debug = this.experience.debug
 
+        this.sailsMaterials = []
+
         this.params = {
-            x: 10,
-            y: 2,
-            z: 2,
+            x: 10, //x: -16 (telefono)
+            y: 2, 
+            z: 2, // z: -64 (telefono)
             scale: 0.125,
-            rotationY: 2, // Math.PI / 2
-            amplitudeY: 0.2,
-            speedY: 0.5
+            rotationY: 2, // Math.PI / 2  //3.61 (telefono)
+            windStrength: 9.5,
+            windSpeed: 0.5,
+            windPrimary: new THREE.Vector3(1.0, 0.0, 1.0), 
+            windCounter: new THREE.Vector3(-0.3, 0.0, -0.3)
         }
 
         // Setup
@@ -47,22 +51,26 @@ export default class Ship
   
                 child.castShadow = true
                 child.receiveShadow = true
-                
 
-                if (child.name.includes('Sails')) {
-                    const originalMaterial = child.material
+               if (child.name.includes('Sails')) 
+                {
 
-                    child.material = new CSM({
-                        baseMaterial: originalMaterial,
+                    const material = new CSM({
+                        baseMaterial: child.material,
                         vertexShader: sailsVertexShader,
                         fragmentShader: sailsFragmentShader,
                         uniforms: {
                             uTime: new THREE.Uniform(0),
-                            uWindSpeed: new THREE.Uniform(1.5),
-                            uWindStrength: new THREE.Uniform(0.2),
+                            uOffset: new THREE.Uniform(Math.random() * 100.0),
+                            uWindSpeed: new THREE.Uniform(this.params.windSpeed),
+                            uWindStrength: new THREE.Uniform(this.params.windStrength),
+                            uWindPrimary: new THREE.Uniform(this.params.windPrimary),
+                            uWindCounter: new THREE.Uniform(this.params.windCounter)
                         }
                     })
-                    this.sailsMaterial = child.material
+
+                    child.material = material
+                    this.sailsMaterials.push(material)
                 }
 
                 if(child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace
@@ -93,17 +101,44 @@ export default class Ship
             shipFolder.add(this.params, 'scale').name('Scale').min(0.001).max(0.8).step(0.001).onChange(() => this.updateModel())
             shipFolder.add(this.params, 'rotationY').name('Rotation Y').min(0).max(Math.PI * 2).step(0.01).onChange(() => this.updateModel())
             
-            // Animation (?) Non used
-            const animFolder = shipFolder.addFolder('Animation')
-            animFolder.add(this.params, 'amplitudeY').name('Oscillation Amp').min(0).max(2).step(0.01)
-            animFolder.add(this.params, 'speedY').name('Oscillation Speed').min(0).max(5).step(0.1)
+
+            // Sails
+            const sailsFolder = shipFolder.addFolder('Sails')
+
+            //Wind
+            const windFolder = sailsFolder.addFolder('Wind')
+            windFolder.add(this.params, 'windSpeed', 0.1).min(0).max(5).name('Wind Speed')
+            windFolder.add(this.params, 'windStrength', 0.01).min(0).max(10).name('Wind Strength')
+            const windDirectionFolder = windFolder.addFolder('Direction')
+            windDirectionFolder.add(this.params.windPrimary, 'x', 0.1).min(-1).max(1).name('Primary X')
+            windDirectionFolder.add(this.params.windPrimary, 'z', 0.1).min(-1).max(1).name('Primary Z')
+            windDirectionFolder.add(this.params.windCounter, 'x', 0.1).min(-1).max(1).name('Counter X')
+            windDirectionFolder.add(this.params.windCounter, 'z', 0.1).min(-1).max(1).name('Counter Z')
         }
     }
 
     update() 
     {
-        if(this.sailsMaterial) {
-            this.sailsMaterial.uniforms.uTime.value = this.experience.time.elapsed * 0.001;
+        const time = this.experience.time.elapsed * 0.001
+        // 1. Logica di galleggiamento e posizione (Fondamentale)
+        this.model.position.set(
+            this.params.x,
+            this.params.y + Math.sin(time * 0.5) * 0.2, // Galleggiamento
+            this.params.z
+        )
+        
+        // Rotazione dinamica per dare vita
+        this.model.rotation.x = Math.sin(time * 0.5) * 0.03
+        this.model.rotation.z = Math.sin(time * 0.3) * 0.02
+
+        for(const mat of this.sailsMaterials) 
+        {
+            mat.uniforms.uTime.value = time
+
+            mat.uniforms.uWindSpeed.value = this.params.windSpeed
+            mat.uniforms.uWindStrength.value = this.params.windStrength
+            mat.uniforms.uWindPrimary.value.copy(this.params.windPrimary)
+            mat.uniforms.uWindCounter.value.copy(this.params.windCounter)
         }
     }
 }

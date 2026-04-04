@@ -1,20 +1,51 @@
 uniform float uTime;
+uniform float uOffset;
 uniform float uWindSpeed;
 uniform float uWindStrength;
+uniform vec3 uWindPrimary;
+uniform vec3 uWindCounter;
 
 varying vec2 vUv;
 
+// Simulates the force of the wind
+float getGaleForce(float time) {
+    float pulse = sin((time + uOffset) * 0.2) * sin((time + uOffset) * 0.7);
+    return smoothstep(0.4, 0.8, pulse);
+}
+
+// Mask to soften the corners of the sails
+float getCornerMask(vec2 uvCoord) {
+    float d = min(min(length(uvCoord - vec2(0.0)), length(uvCoord - vec2(1.0, 0.0))),
+                  min(length(uvCoord - vec2(0.0, 1.0)), length(uvCoord - vec2(1.0))));
+    return smoothstep(0.0, 0.15, d);
+}
+
 void main() {
     vUv = uv;
+    float mask = getCornerMask(uv);
+    vec3 norm = normalize(normal);
 
-    // Maschera basata sulle UV: 
-    // Immaginiamo che a x=0 la vela sia attaccata al palo.
-    // Più ci allontaniamo (x -> 1), più la vela può muoversi.
-    float mask = smoothstep(0.0, 0.5, uv.x); 
+    float localTime = (uTime + uOffset) * uWindSpeed;
 
-    // Calcolo del vento usando seno e coseno incrociati
-    float wave = sin(position.y * 3.0 + uTime * uWindSpeed) * cos(position.z * 2.0 + uTime * uWindSpeed * 0.5);
+    // Main Wind Drive
+    float gale = getGaleForce(uTime); 
+    
+    // Get the intensity based on the DIRECTION 
+    float primaryIntensity = max(0.0, dot(norm, normalize(uWindPrimary)));
+    float counterIntensity = max(0.0, dot(norm, normalize(uWindCounter)));
+    float currentWindDrive = mix(primaryIntensity, -counterIntensity * 1.5, gale); //Based on gale (random pulse), control witch force to use.
 
-    // Spostiamo il vertice lungo la sua normale (si gonfia verso l'esterno)
-    csm_Position += normal * wave * uWindStrength * mask;
+    // Wave patterns on the sails
+    float w1 = sin(uv.x * 4.0 - localTime * 5.0 + uOffset);
+    float w2 = sin(uv.x * 7.5 + uv.y * 2.0 - localTime * 8.0 + (uOffset * 0.5)) * 0.4;
+    float w3 = sin(uv.x * 15.0 - localTime * 12.0) * 0.1;
+
+    float combinedWave = mix(w1 + w2 + w3, -(w1 + w2), gale);
+
+    //Inflation for volume
+    float inflation = 0.5 * currentWindDrive;
+
+    float displacement = (inflation + combinedWave * 0.4) * uWindStrength * mask;
+
+    csm_Position += normal * displacement;
 }
