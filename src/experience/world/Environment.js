@@ -21,15 +21,22 @@ export default class Environment
             mieDirectionalG: 0.7,
             elevation: 2,   // Angolo del sole (0 = orizzonte)
             azimuth: 160,   // Posizione intorno al piano  //180 (telefono)
-            exposure: 0.5
+            exposure: 0.5,
+
+            //Shadow
+            shadowSize: 30, 
+            shadowNear: 1,
+            shadowFar: 100,
+            shadowBias: -0.0005,
+            showShadowHelper: false 
         }
 
         this.sun = new THREE.Vector3()
 
         this.setSky()
         this.setFog()
-        this.setDebug()
         this.updateSun()
+        this.setDebug()
     }
 
     setSky() {
@@ -63,7 +70,34 @@ export default class Environment
         //Light for simulate the sun
         if(!this.sunLight) {
             this.sunLight = new THREE.DirectionalLight('#ffe3d5', 2) // Intensità 2 o più
+
+            //Shadow
+            this.sunLight.castShadow = true
+            this.sunLight.shadow.mapSize.set(2048, 2048)
+            this.sunLight.shadow.camera.near = 1
+            this.sunLight.shadow.camera.far = 100
+            this.sunLight.shadow.camera.left = -30
+            this.sunLight.shadow.camera.right = 30
+            this.sunLight.shadow.camera.top = 30
+            this.sunLight.shadow.camera.bottom = -30
+            this.sunLight.shadow.bias = -0.0005
+            
             this.scene.add(this.sunLight)
+
+
+            this.shadowHelper = new THREE.CameraHelper(this.sunLight.shadow.camera)
+            this.shadowHelper.visible = this.params.showShadowHelper
+            this.scene.add(this.shadowHelper)
+
+            this.scene.add(this.sunLight)
+        }
+
+        // Position the sun light FAR from the center
+        this.sunLight.position.copy(this.sun).multiplyScalar(40);
+        this.sunLight.lookAt(0, 0, 0);  
+
+        if(this.shadowHelper) {
+            this.shadowHelper.update()
         }
 
         //Copy direction of the sky To handle better
@@ -75,11 +109,12 @@ export default class Environment
     }
 
     updateEnvironmentMap() {
-        // Usa .instance se il tuo renderer è dentro un wrapper
+        // Make the sky the environment map for reflections (it's like a better ambient light)
         const pmremGenerator = new THREE.PMREMGenerator(this.experience.renderer.instance) 
         
         const renderTarget = pmremGenerator.fromScene(this.sky)
         this.scene.environment = renderTarget.texture
+        this.scene.environmentIntensity = 1.5;
         
         pmremGenerator.dispose()
     }
@@ -97,6 +132,34 @@ export default class Environment
             const fogFolder = this.debug.getFolder('World/Environment/Fog');
             fogFolder.add(this.scene.fog, 'density', 0, 0.1, 0.001).name('Fog Density');
             fogFolder.addColor(this.scene.fog, 'color').name('Fog Color');
+
+            //Shadow
+            const shadowFolder = this.debug.getFolder('World/Environment/Shadows');
+    
+            const updateShadowCamera = () => {
+                this.sunLight.shadow.camera.near = this.params.shadowNear;
+                this.sunLight.shadow.camera.far = this.params.shadowFar;
+                this.sunLight.shadow.camera.left = -this.params.shadowSize;
+                this.sunLight.shadow.camera.right = this.params.shadowSize;
+                this.sunLight.shadow.camera.top = this.params.shadowSize;
+                this.sunLight.shadow.camera.bottom = -this.params.shadowSize;
+                
+                // Obbligatorio in Three.js quando cambi near/far/left/right/ecc
+                this.sunLight.shadow.camera.updateProjectionMatrix();
+                
+                if(this.shadowHelper) this.shadowHelper.update();
+            }
+
+            shadowFolder.add(this.params, 'showShadowHelper').name('Show Helper').onChange((value) => {
+                this.shadowHelper.visible = value;
+            });
+
+            shadowFolder.add(this.params, 'shadowSize', 10, 200, 1).name('Area Size').onChange(updateShadowCamera);
+            shadowFolder.add(this.params, 'shadowNear', 0.1, 100, 0.1).name('Near').onChange(updateShadowCamera);
+            shadowFolder.add(this.params, 'shadowFar', 10, 500, 1).name('Far').onChange(updateShadowCamera);
+            shadowFolder.add(this.params, 'shadowBias', -0.01, 0.01, 0.0001).name('Bias').onChange(() => {
+                this.sunLight.shadow.bias = this.params.shadowBias;
+            });
         }
     }
 }

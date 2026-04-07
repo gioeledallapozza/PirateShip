@@ -21,7 +21,7 @@ export default class Ship
             y: 2, 
             z: 2, // z: -64 (telefono)
             scale: 0.125,
-            rotationY: 2, // Math.PI / 2  //3.61 (telefono)
+            rotationY: 4.16, // Math.PI / 2  //3.61 (telefono)
             windStrength: 9.5,
             windSpeed: 0.5,
             windPrimary: new THREE.Vector3(1.0, 0.0, 1.0), 

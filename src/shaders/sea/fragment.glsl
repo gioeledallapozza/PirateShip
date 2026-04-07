@@ -40,6 +40,11 @@ varying vec2 vUv;
 varying float vFoam;
 
 #include <fog_pars_fragment>
+#include <common>
+#include <packing>
+#include <lights_pars_begin>
+#include <shadowmap_pars_fragment>
+#include <shadowmask_pars_fragment>
 
 void main() {
 
@@ -93,16 +98,25 @@ void main() {
     float fresnel = pow(1.0 - max(0.0, dot(normal, viewDirection)), uFresnelPower);
 
     //Shadows 
-    vec3 finalColor = baseColor * (diffuse * 0.5 + 0.5);
+   float shadow = 1.0;
+    
+    #ifdef USE_SHADOWMAP
+        // Ora questa funzione esiste grazie all'include corretto
+        shadow = getShadowMask();
+    #endif
+    
+    float shadowFactor = mix(0.4, 1.0, shadow);
+
+    vec3 finalColor = baseColor * (diffuse * 0.5 + 0.5) * shadowFactor;
     
     // Reflexs
-    finalColor += specular * uSpecularIntensity * uSpecularColor;
+    finalColor += specular * uSpecularIntensity * uSpecularColor * shadowFactor;
 
     // Subsurface scattering
     float sssInversion = max(0.0, dot(viewDirection, -lightDirection));
     float sssFactor = pow(sssInversion, uSSSPower); 
     float waveThinness = smoothstep(0.0, uSSSDepth, vElevation); 
-    vec3 sssGlow = uSSSColor * sssFactor * waveThinness * uSSSIntensity;
+    vec3 sssGlow = uSSSColor * sssFactor * waveThinness * uSSSIntensity * shadowFactor;
     sssGlow *= (1.0 - foamStrength * 0.5);
     finalColor += sssGlow;
 
@@ -112,7 +126,7 @@ void main() {
     //Foam
     foamColor += finalColor;
     finalColor = mix(finalColor, foamColor, foamStrength);
-    vec3 litFoamColor = foamColor * (diffuse * 0.5 + 0.5) * uSpecularColor;
+    vec3 litFoamColor = foamColor * (diffuse * 0.5 + 0.5) * uSpecularColor * shadowFactor;
     finalColor = mix(finalColor, litFoamColor, foamStrength);
 
     gl_FragColor = vec4(finalColor, 1.0);

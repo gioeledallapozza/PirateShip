@@ -107,8 +107,10 @@ export default class Sea
         this.material = new THREE.ShaderMaterial({
             vertexShader: seaVertexShader,
             fragmentShader: seaFragmentShader,
+            lights: true,
             uniforms: THREE.UniformsUtils.merge([
                 THREE.UniformsLib['fog'],
+                THREE.UniformsLib['lights'],
                 {
                     //Time
                     uTime: new THREE.Uniform(0),
@@ -155,53 +157,28 @@ export default class Sea
 
     setWaves(){
         this.BigWaveData = [
-    // ONDE PORTANTI (Grandi masse d'acqua)
-    { direction: new THREE.Vector2(1.0, 0.1).normalize(), steepness: 0.5, elevation: 0.45, frequency: 0.08, speed: 0.6 },
-    { direction: new THREE.Vector2(-0.7, 0.4).normalize(), steepness: 0.7, elevation: 0.30, frequency: 0.15, speed: 0.9 },
+            // Main Waves
+            { direction: new THREE.Vector2(1.0, 0.1).normalize(), steepness: 0.5, elevation: 0.45, frequency: 0.08, speed: 0.6 },
+            { direction: new THREE.Vector2(-0.7, 0.4).normalize(), steepness: 0.7, elevation: 0.30, frequency: 0.15, speed: 0.9 },
 
-    // ONDE MEDIE (Rompono il pattern delle grandi)
-    { direction: new THREE.Vector2(0.3, 0.8).normalize(), steepness: 0.15, elevation: 0.12, frequency: 0.35, speed: 1.4 },
-    { direction: new THREE.Vector2(-0.2, -0.9).normalize(), steepness: 0.1, elevation: 0.08, frequency: 0.55, speed: 2.1 },
+            // Secondary waves
+            { direction: new THREE.Vector2(0.3, 0.8).normalize(), steepness: 0.15, elevation: 0.12, frequency: 0.35, speed: 1.4 },
+            { direction: new THREE.Vector2(-0.2, -0.9).normalize(), steepness: 0.1, elevation: 0.08, frequency: 0.55, speed: 2.1 },
 
-    // MICRO-TURBOLENZA (Eliminano l'effetto plastica)
-    { direction: new THREE.Vector2(0.8, -0.5).normalize(), steepness: 0.05, elevation: 0.04, frequency: 1.2, speed: 3.5 },
-    { direction: new THREE.Vector2(-0.5, 0.1).normalize(), steepness: 0.05, elevation: 0.02, frequency: 2.5, speed: 4.2 }
-];
-    //   this.BigWaveData = [
-    //         // 1. L'ONDA DOMINANTE: Più grande e più lenta, decide la direzione del mare
-    //        { 
-    //             direction: new THREE.Vector2(1.0, 0.5).normalize(), // Direzione diagonale "sporca"
-    //             steepness: 0.4,   // Abbastanza ripida per la schiuma
-    //             elevation: 0.4,   // Alza il volume del mare
-    //             frequency: 0.4,   // Circa 1.2 creste in tutto il piano da 20m
-    //             speed: 1.2 
-    //         },
-    //         // 2. L'ONDA DI CONTRASTO (Più corta, rompe il ritmo)
-    //         { 
-    //             direction: new THREE.Vector2(-0.8, 0.3).normalize(), 
-    //             steepness: 0.3, 
-    //             elevation: 0.15, 
-    //             frequency: 1.1,  // Numero non multiplo della prima
-    //             speed: 1.8 
-    //         },
-    //         // 3. IL DETTAGLIO (Onde di vento superficiali)
-    //         { 
-    //             direction: new THREE.Vector2(0.1, 1.0).normalize(), 
-    //             steepness: 0.2, 
-    //             elevation: 0.05, 
-    //             frequency: 2.7, 
-    //             speed: 2.5 
-    //         }
-    //     ];
+            // Small ripples
+            { direction: new THREE.Vector2(0.8, -0.5).normalize(), steepness: 0.05, elevation: 0.04, frequency: 1.2, speed: 3.5 },
+            { direction: new THREE.Vector2(-0.5, 0.1).normalize(), steepness: 0.05, elevation: 0.02, frequency: 2.5, speed: 4.2 }
+        ];
     }
 
     setMesh(){
+        //Set mesh
         this.mesh = new THREE.Mesh(
             this.geometry, 
             this.material
         );
         this.mesh.rotation.x = -Math.PI * 0.5;
-
+        this.mesh.receiveShadow = true;
         this.scene.add(this.mesh);
     }
 

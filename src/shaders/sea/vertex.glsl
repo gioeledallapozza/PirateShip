@@ -13,6 +13,8 @@ varying float vFoam;
 
 #include ../includes/getGerstnerWave.glsl
 #include <fog_pars_vertex>
+#include <common>
+#include <shadowmap_pars_vertex>
 
 void main() {
 
@@ -45,6 +47,8 @@ void main() {
     currentPos += finalOffset;
     modelPosition.xyz = currentPos;
 
+    vec4 worldPosition = vec4(currentPos, 1.0); 
+    vec3 transformedNormal = normalize(cross(finalTangent, finalBitangent));
     vec4 mvPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * mvPosition;
 
@@ -52,12 +56,13 @@ void main() {
 
     //Varyings
     vElevation = currentPos.y;
-    vNormal = normalize(cross(finalTangent, finalBitangent)); //Prodotto Vettoriale
+    vNormal = transformedNormal; //Prodotto Vettoriale
     vTangent = finalTangent;
     vBitangent = finalBitangent;
-    vWorldPosition = modelPosition.xyz;
+    vWorldPosition = worldPosition.xyz;
     vUv = uv;
     vFoam = smoothstep(0.2, 0.4, cumulativeSteepness);
 
     #include <fog_vertex>
+    #include <shadowmap_vertex>
 }
