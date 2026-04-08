@@ -17,9 +17,9 @@ export default class Ship
         this.sailsMaterials = []
 
         this.params = {
-            x: 10, //x: -16 (telefono)
+            x: -10, //x: -16 (telefono)
             y: 2, 
-            z: 2, // z: -64 (telefono)
+            z: 12.5, // z: -64 (telefono)
             scale: 0.125,
             rotationY: 4.16, // Math.PI / 2  //3.61 (telefono)
             windStrength: 9.5,

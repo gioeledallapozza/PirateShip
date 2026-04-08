@@ -19,8 +19,8 @@ export default class Environment
             rayleigh: 3,
             mieCoefficient: 0.005,
             mieDirectionalG: 0.7,
-            elevation: 2,   // Angolo del sole (0 = orizzonte)
-            azimuth: 160,   // Posizione intorno al piano  //180 (telefono)
+            elevation: 2,   // Sun angle (0 = horizon, 90 = zenith)  //10 (telefono)
+            azimuth: 160,   //180 (telefono)
             exposure: 0.5,
 
             //Shadow
@@ -54,7 +54,7 @@ export default class Environment
 
     setFog(){
         const fogColor = '#d8a08f'; 
-        this.scene.fog = new THREE.FogExp2(fogColor, 0.008);
+        this.scene.fog = new THREE.FogExp2(fogColor, 0.007);
     }
 
     updateSun() {

@@ -97,6 +97,10 @@ void main() {
     // Frensel effect 
     float fresnel = pow(1.0 - max(0.0, dot(normal, viewDirection)), uFresnelPower);
 
+    // Ambient light from the sky
+    float skyDiffuser = normal.y * 0.5 + 0.5; 
+    vec3 ambientLight = uSkyColor * skyDiffuser * 10.0; //0.25 regulate the intensity
+
     //Shadows 
    float shadow = 1.0;
     
@@ -107,7 +111,9 @@ void main() {
     
     float shadowFactor = mix(0.4, 1.0, shadow);
 
-    vec3 finalColor = baseColor * (diffuse * 0.5 + 0.5) * shadowFactor;
+    // Final color composition
+    vec3 litColor = baseColor * (diffuse * 0.8 + 0.2); 
+    vec3 finalColor = (litColor + ambientLight) * shadowFactor;
     
     // Reflexs
     finalColor += specular * uSpecularIntensity * uSpecularColor * shadowFactor;
@@ -120,14 +126,18 @@ void main() {
     sssGlow *= (1.0 - foamStrength * 0.5);
     finalColor += sssGlow;
 
-    // Sky
-    finalColor = mix(finalColor, uSkyColor, fresnel * uFresnelIntensity);
 
     //Foam
     foamColor += finalColor;
     finalColor = mix(finalColor, foamColor, foamStrength);
     vec3 litFoamColor = foamColor * (diffuse * 0.5 + 0.5) * uSpecularColor * shadowFactor;
     finalColor = mix(finalColor, litFoamColor, foamStrength);
+
+
+    // Sky
+    finalColor = mix(finalColor, uSkyColor, fresnel * uFresnelIntensity);
+
+
 
     gl_FragColor = vec4(finalColor, 1.0);
 
