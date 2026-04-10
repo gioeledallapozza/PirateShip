@@ -72,6 +72,20 @@ export default class Ship
                     child.material = material
                     this.sailsMaterials.push(material)
                 }
+                else if (child.name.includes('Window')) {
+                    child.material.emissiveIntensity = 10.0
+                    child.material.emissive = new THREE.Color('#9c6800') 
+                    child.material.roughness = 0
+                    child.material.metalness = 1.0
+                    // child.material = new THREE.MeshStandardMaterial({
+                    //     color: new THREE.Color('#000000'), 
+                    //     emissive: new THREE.Color('#ffaa00'), // Arancione caldo lanterna
+                    //     emissiveIntensity: 1, // Spinge oltre il Threshold del Bloom
+                    //     roughness: 0,
+                    //     metalness: 0.5
+                    // })
+                }
+          
 
                 if(child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace
             }

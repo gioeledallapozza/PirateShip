@@ -21,7 +21,7 @@ export default class Environment
             mieDirectionalG: 0.7,
             elevation: 2,   // Sun angle (0 = horizon, 90 = zenith)  //10 (telefono)
             azimuth: 160,   //180 (telefono)
-            exposure: 0.5,
+            exposure: 1.0,
 
             //Shadow
             shadowSize: 30, 
@@ -125,8 +125,11 @@ export default class Environment
             
             skyFolder.add(this.params, 'turbidity', 0, 20).onChange(() => this.skyVariables['turbidity'].value = this.params.turbidity)
             skyFolder.add(this.params, 'rayleigh', 0, 4).onChange(() => this.skyVariables['rayleigh'].value = this.params.rayleigh)
-            skyFolder.add(this.params, 'elevation', 0, 90, 0.1).name('Sun Elevation').onChange(() => this.updateSun())
+            skyFolder.add(this.params, 'elevation', 0, 5, 0.1).name('Sun Elevation').onChange(() => this.updateSun())
             skyFolder.add(this.params, 'azimuth', -180, 180, 0.1).name('Sun Azimuth').onChange(() => this.updateSun())
+            skyFolder.add(this.params, 'exposure', 0, 2, 0.01).name('Exposure').onChange(() => {
+                this.experience.renderer.instance.toneMappingExposure = this.params.exposure
+            })
 
 
             const fogFolder = this.debug.getFolder('World/Environment/Fog');
