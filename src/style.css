@@ -155,3 +155,28 @@ body.immersive-mode {
 body.immersive-mode .webgl {
     z-index: 10;
 }
+
+
+
+
+/*
+* THREE.JS EXPERIENCE
+*/
+/* * Start Experience Transitions 
+*/
+#ui-wrapper {
+    transition: opacity 1s ease, visibility 1s;
+    opacity: 1;
+    visibility: visible;
+}
+
+#ui-wrapper.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; /* Prevent interaction when hidden */
+}
+
+.main-header.hidden {
+    transform: translateY(-100%);
+    transition: transform 0.5s ease;
+}

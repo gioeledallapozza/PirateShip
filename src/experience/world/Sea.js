@@ -4,7 +4,8 @@ import Experience from '../Experience.js';
 import seaFragmentShader from '../../shaders/sea/fragment.glsl';
 import seaVertexShader from '../../shaders/sea/vertex.glsl';
 import { ThreeMFLoader } from 'three/examples/jsm/Addons.js';
-import { color, vec2 } from 'three/tsl';
+import { color, fog, vec2 } from 'three/tsl';
+import { Fog } from 'three/webgpu';
 
 export default class Sea 
 {
@@ -87,6 +88,16 @@ export default class Sea
             sssFolder.add(this.material.uniforms.uSSSDepth, 'value', -1, 1, 0.01).name('Depth Mask');
             sssFolder.close();
 
+            //Fog
+            const fogFolder = this.debug.getFolder('World/Sea/Fog');
+            fogFolder.addColor(this.material.uniforms.uFogColorSun, 'value').name('Fog Color Sun');
+            fogFolder.addColor(this.material.uniforms.uFogColorDark, 'value').name('Fog Color Dark');
+            fogFolder.add(this.material.uniforms.uFogFactor, 'value', 0, 10, 0.1).name('Fog Factor');
+            fogFolder.add(this.material.uniforms.uFogHaloEdge, 'value', 0, 1, 0.01).name('Fog Halo Edge');
+            fogFolder.add(this.material.uniforms.uFogTailStrength, 'value', 0, 1, 0.01).name('Fog Tail Strength');
+            fogFolder.add(this.material.uniforms.uFogPeakStrength, 'value', 0, 1, 0.01).name('Fog Peak Strength');
+            fogFolder.close();
+
             //Colors
             const colorFolder = this.debug.getFolder('World/Sea/Colors');
             colorFolder.addColor(this.material.uniforms.uDepthColor, 'value').name('Depth Color');
@@ -147,7 +158,14 @@ export default class Sea
                     uSSSColor: new THREE.Uniform(new THREE.Color('#00ff80')),
                     uSSSIntensity: new THREE.Uniform(0.5),              
                     uSSSPower: new THREE.Uniform(18.0),                    
-                    uSSSDepth: new THREE.Uniform(0.80)                    
+                    uSSSDepth: new THREE.Uniform(0.80),
+                    //Fog
+                    uFogColorSun: new THREE.Uniform(new THREE.Color('#cd8b7b').convertLinearToSRGB()),
+                    uFogColorDark: new THREE.Uniform(new THREE.Color('#2c2021').convertLinearToSRGB()),
+                    uFogFactor: new THREE.Uniform(2.0),
+                    uFogHaloEdge: new THREE.Uniform(0.95), 
+                    uFogTailStrength: new THREE.Uniform(0.4),  
+                    uFogPeakStrength: new THREE.Uniform(0.88)    
                 }            
             ]),
             fog: true,

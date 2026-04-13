@@ -39,6 +39,13 @@ varying vec3 vWorldPosition;
 varying vec2 vUv;
 varying float vFoam;
 
+uniform vec3 uFogColorSun;
+uniform vec3 uFogColorDark;
+uniform float uFogFactor;
+uniform float uFogHaloEdge;
+uniform float uFogTailStrength;
+uniform float uFogPeakStrength; 
+
 #include <fog_pars_fragment>
 #include <common>
 #include <packing>
@@ -137,9 +144,37 @@ void main() {
     // Sky
     finalColor = mix(finalColor, uSkyColor, fresnel * uFresnelIntensity);
 
-
-
     gl_FragColor = vec4(finalColor, 1.0);
 
-    #include <fog_fragment>
+    // #include <fog_fragment>
+    #ifdef USE_FOG
+        
+        //Native three.js fog
+        #ifdef FOG_EXP2
+            float fogFactor = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );
+        #else
+            float fogFactor = smoothstep( fogNear, fogFar, vFogDepth );
+        #endif
+    
+
+        //How much the sun influences the fog based on direction
+        float sunMix = dot(-viewDirection, normalize(uLightDirection)); 
+        sunMix = sunMix * 0.5 + 0.5; //Remapping from [-1,1] to [0,1]
+
+        //LongTail
+        float longTail = pow(smoothstep(0.0, uFogHaloEdge, sunMix), uFogFactor) * uFogTailStrength;
+
+        //Sun Light Aura
+        float sunPeak = smoothstep(uFogHaloEdge, 1.0, sunMix) * uFogPeakStrength;
+
+        //Clamp the total influence to avoid overbrightening
+        float customCurve = clamp(longTail + sunPeak, 0.0, 1.0);
+
+        // Custom color
+        vec3 customFogColor = mix(uFogColorDark, uFogColorSun, customCurve);
+
+        //Apply Final color
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, customFogColor, fogFactor);
+        
+    #endif
 }

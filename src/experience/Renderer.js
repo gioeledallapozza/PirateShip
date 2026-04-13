@@ -1,9 +1,9 @@
 import * as THREE from 'three'
 import Experience from './Experience.js'
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
-import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js'
+// import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+// import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+// import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+// import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js'
 
 export default class Renderer {
     constructor() {
@@ -22,7 +22,7 @@ export default class Renderer {
     setInstance() {
         this.instance = new THREE.WebGLRenderer({
             canvas: this.canvas,
-            // antialias: true,
+            antialias: true,
             alpha: false //background css
         })
 
@@ -45,24 +45,24 @@ export default class Renderer {
     setComposer(){
 
         //POST-PROCESSING
-        const renderTarget = new THREE.WebGLRenderTarget(
-        this.sizes.width,
-        this.sizes.height,
-        {
-            samples: 4,
-            type: THREE.HalfFloatType, // <--- FONDAMENTALE per ACESFilmic e Bloom
-            format: THREE.RGBAFormat,
-            colorSpace: THREE.LinearSRGBColorSpace,
-        }
-    )
+    //     const renderTarget = new THREE.WebGLRenderTarget(
+    //     this.sizes.width,
+    //     this.sizes.height,
+    //     {
+    //         samples: 4,
+    //         type: THREE.HalfFloatType, // <--- FONDAMENTALE per ACESFilmic e Bloom
+    //         format: THREE.RGBAFormat,
+    //         colorSpace: THREE.LinearSRGBColorSpace,
+    //     }
+    // )
 
-        this.composer = new EffectComposer(this.instance, renderTarget)
-        this.composer.setPixelRatio(this.sizes.pixelRatio)
-        this.composer.setSize(this.sizes.width, this.sizes.height)
+    //     this.composer = new EffectComposer(this.instance, renderTarget)
+    //     this.composer.setPixelRatio(this.sizes.pixelRatio)
+    //     this.composer.setSize(this.sizes.width, this.sizes.height)
 
 
-        const renderPass = new RenderPass(this.scene, this.camera.instance)
-        this.composer.addPass(renderPass)
+    //     const renderPass = new RenderPass(this.scene, this.camera.instance)
+    //     this.composer.addPass(renderPass)
 
         // this.bloomPass = new UnrealBloomPass(
         //     new THREE.Vector2(this.sizes.width, this.sizes.height),
@@ -94,7 +94,7 @@ export default class Renderer {
     }
 
     update() {
-        // this.instance.render(this.scene, this.camera.instance)
-        this.composer.render()
+        this.instance.render(this.scene, this.camera.instance)
+        // this.composer.render()
     }
 }
