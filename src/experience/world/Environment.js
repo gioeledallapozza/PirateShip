@@ -121,6 +121,10 @@ export default class Environment
 
     setDebug() {
         if(this.debug.active) {
+            const environmentFolder = this.debug.getFolder('World/Environment');
+            environmentFolder.close();
+
+            //Sky
             const skyFolder = this.debug.getFolder('World/Environment/Sky');
             
             skyFolder.add(this.params, 'turbidity', 0, 20).onChange(() => this.skyVariables['turbidity'].value = this.params.turbidity)
@@ -130,11 +134,12 @@ export default class Environment
             skyFolder.add(this.params, 'exposure', 0, 2, 0.01).name('Exposure').onChange(() => {
                 this.experience.renderer.instance.toneMappingExposure = this.params.exposure
             })
-
+            skyFolder.close();
 
             const fogFolder = this.debug.getFolder('World/Environment/Fog');
             fogFolder.add(this.scene.fog, 'density', 0, 0.1, 0.001).name('Fog Density');
             fogFolder.addColor(this.scene.fog, 'color').name('Fog Color');
+            fogFolder.close();
 
             //Shadow
             const shadowFolder = this.debug.getFolder('World/Environment/Shadows');
@@ -163,6 +168,7 @@ export default class Environment
             shadowFolder.add(this.params, 'shadowBias', -0.01, 0.01, 0.0001).name('Bias').onChange(() => {
                 this.sunLight.shadow.bias = this.params.shadowBias;
             });
+            shadowFolder.close();
         }
     }
 }

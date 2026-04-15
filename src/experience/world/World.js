@@ -3,6 +3,7 @@ import Experience from "../Experience.js";
 import Environment from "./Environment.js";
 import Sea from "./Sea.js";
 import Ship from "./Ship.js";
+import Hotpoints from "./Hotpoints.js";
 
 export default class World{
     constructor() {
@@ -19,6 +20,7 @@ export default class World{
             this.sea = new Sea();
             this.ship = new Ship();
             this.environment = new Environment();
+            this.hotpoints = new Hotpoints();
         })
     }
 
@@ -28,6 +30,9 @@ export default class World{
         }
         if (this.ship) {
             this.ship.update();
+        }
+        if(this.hotpoints) {
+            this.hotpoints.update();
         }
     }
 }

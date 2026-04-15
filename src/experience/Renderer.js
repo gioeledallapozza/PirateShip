@@ -78,12 +78,13 @@ export default class Renderer {
 
     setDebug(){
         if(this.debug.active){
-            this.debugFolder = this.debug.getFolder('Renderer')
+            const debugFolder = this.debug.getFolder('Renderer')
+            debugFolder.close();
 
             if(this.bloomPass) {
-                this.debugFolder.add(this.bloomPass, 'strength').min(0).max(3).step(0.01).name('Bloom strength')
-                this.debugFolder.add(this.bloomPass, 'radius').min(0).max(1).step(0.01).name('Bloom radius')
-                this.debugFolder.add(this.bloomPass, 'threshold').min(0).max(2).step(0.01).name('Bloom threshold')
+                debugFolder.add(this.bloomPass, 'strength').min(0).max(3).step(0.01).name('Bloom strength')
+                debugFolder.add(this.bloomPass, 'radius').min(0).max(1).step(0.01).name('Bloom radius')
+                debugFolder.add(this.bloomPass, 'threshold').min(0).max(2).step(0.01).name('Bloom threshold')
             }
         }
     }

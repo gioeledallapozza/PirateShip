@@ -122,16 +122,19 @@ export default class Ship
 
             // Sails
             const sailsFolder = shipFolder.addFolder('Sails')
+            sailsFolder.close();
 
             //Wind
             const windFolder = sailsFolder.addFolder('Wind')
             windFolder.add(this.params, 'windSpeed', 0.1).min(0).max(5).name('Wind Speed')
             windFolder.add(this.params, 'windStrength', 0.01).min(0).max(10).name('Wind Strength')
+            windFolder.close();
             const windDirectionFolder = windFolder.addFolder('Direction')
             windDirectionFolder.add(this.params.windPrimary, 'x', 0.1).min(-1).max(1).name('Primary X')
             windDirectionFolder.add(this.params.windPrimary, 'z', 0.1).min(-1).max(1).name('Primary Z')
             windDirectionFolder.add(this.params.windCounter, 'x', 0.1).min(-1).max(1).name('Counter X')
             windDirectionFolder.add(this.params.windCounter, 'z', 0.1).min(-1).max(1).name('Counter Z')
+            windDirectionFolder.close();
         }
     }
 

@@ -69,6 +69,8 @@ export default class Experience {
             onComplete: () => {
                 this.camera.controls.maxDistance = 50
                 this.camera.controls.enabled = true
+
+                this.world.hotpoints.activate();
             }
         })
     }

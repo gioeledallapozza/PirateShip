@@ -54,7 +54,7 @@ export default class Camera {
 
         this.controls.enableDamping = true 
 
-        this.controls.enablePan = false; //Panning
+        this.controls.enablePan = true; //Panning
         
         // Security limit
         this.controls.maxPolarAngle = Math.PI / 2 - 0.05 
@@ -64,9 +64,9 @@ export default class Camera {
 
     setDebug() {
         if(this.debug.active) {
-            const folder = this.debug.getFolder('Camera/Position');
+            const cameraPosFolder = this.debug.getFolder('Camera/Position');
 
-            // Funzione interna per aggiornare il lookAt ogni volta che muovi la camera
+            // Internal function to update lookAt every time we update the camera
             const updateLookAt = () => {
                 this.instance.lookAt(
                     this.params.lookAt.x, 
@@ -75,12 +75,15 @@ export default class Camera {
                 );
             };
 
-            folder.add(this.instance.position, 'x').min(-50).max(50).step(0.1).name('Pos X').onChange(updateLookAt);
-            folder.add(this.instance.position, 'y').min(0).max(50).step(0.1).name('Pos Y').onChange(updateLookAt);
-            folder.add(this.instance.position, 'z').min(0).max(200).step(0.1).name('Pos Z').onChange(updateLookAt);
-            
+            cameraPosFolder.add(this.instance.position, 'x').min(-50).max(50).step(0.1).name('Pos X').onChange(updateLookAt);
+            cameraPosFolder.add(this.instance.position, 'y').min(0).max(50).step(0.1).name('Pos Y').onChange(updateLookAt);
+            cameraPosFolder.add(this.instance.position, 'z').min(0).max(200).step(0.1).name('Pos Z').onChange(updateLookAt);
+            cameraPosFolder.close();
+
             const lookAtFolder = this.debug.getFolder('Camera/LookAt');
             lookAtFolder.add(this.params.lookAt, 'y').min(-20).max(20).step(0.1).name('Target Y').onChange(updateLookAt);
+            lookAtFolder.close();
+
         }
     }
 

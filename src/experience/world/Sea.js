@@ -25,6 +25,12 @@ export default class Sea
 
     setDebug() {
         if(this.debug.active) {
+
+            //SEA FOLDER
+            const seaFolder = this.debug.getFolder('World/Sea');
+            seaFolder.close();
+
+
             //Big Waves
             const bigWavesFolder = this.debug.getFolder('World/Sea/Big Waves');
             this.BigWaveData.forEach((wave, index) => {
@@ -116,6 +122,7 @@ export default class Sea
         this.setWaves()
 
         this.material = new THREE.ShaderMaterial({
+            precision: 'lowp',
             vertexShader: seaVertexShader,
             fragmentShader: seaFragmentShader,
             lights: true,
