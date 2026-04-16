@@ -12,25 +12,56 @@ export default class Hotpoints{
 
         this.setPoints();
         this.setParameters();
+        this.setEvents();
         this.setDebug();
     }
 
     setPoints(){
         const pointsData = [
             {
-                position: new THREE.Vector3(21.9, 8.5, 31.9), 
-                title: 'Project Alpha',
-                element: document.querySelector('.point-0') // div HTML 
+                position: new THREE.Vector3(-16.44, 6.65, 9.04), 
+                category: 'Origin',
+                title: 'The Navigator',
+                description: `Computer Science student in Padua, currently in my second year.
+
+                    I work part-time as a software developer in industrial automation, where things need to be solid, predictable, and efficient.
+
+                    At the same time, I’m exploring the creative side of development, building interactive 3D experiences for the web. This project is where those two worlds start to meet.`
             },
             {
-                position: new THREE.Vector3(-16.44, 6.65, 9.04), 
-                title: 'Creative Lab',
-                element: document.querySelector('.point-1') // div HTML 
+                position: new THREE.Vector3(-6.9, 27.55, 14.92), 
+                category: 'Technical',
+                title: "Ship's Anatomy",
+                description: `This project is built with vanilla Three.js.
+
+                    I focused on understanding what’s happening under the hood: custom shaders for the ocean, raycasting for interactions, and syncing 3D elements with the DOM.
+
+                    Not perfect, but every piece is something I wanted to understand deeply, not just use.`
+            },
+            {
+                position: new THREE.Vector3(-0.96, 6.05, 17.86), 
+                category: 'Philosophy',
+                title: 'Hybrid Mindset',
+                description: `I spend a good amount of time training in the gym.
+
+                    At some point I realized I approach coding in a similar way: building something that works is not enough, I also care about how it looks and feels.
+
+                    Structure matters, but so do the details.`
+            },
+            {
+                position: new THREE.Vector3(21.9, 8.5, 31.9), 
+                category: 'Future',
+                title: 'New Horizons',
+                description: `Right now I’m learning more about React Three Fiber and advanced shader techniques.
+
+                    This project is just a step, not a final product.
+
+                    I’m trying to get better at building things that are not only functional, but also engaging to explore.`
             }
         ];
 
         this.points = [];
-        const container = document.querySelector('.hotpointsContainer');
+        this.container = document.querySelector('.hotpointsContainer');
 
         //Cycle through the data and create the HTML elements
         pointsData.forEach((data, index) => {
@@ -46,12 +77,15 @@ export default class Hotpoints{
                 </div>
             `;
 
+            //Save the index
+            element.dataset.index = index;
+
             //Add to DOM
-            container.appendChild(element);
+            this.container.appendChild(element);
 
             // Save the point data
             this.points.push({
-                position: data.position,
+                ...data,
                 element: element
             });
         });
@@ -61,6 +95,26 @@ export default class Hotpoints{
         this.raycaster = new THREE.Raycaster();
         this.shipModel = this.experience.world.ship.model;
         this.active = false;
+    }
+
+    setEvents(){
+        //save the modal
+        this.modal = document.querySelector('#project-modal');
+        this.btnClose = this.modal.querySelector('.close-btn');
+
+        this.container.addEventListener('click', (event) => {
+            const clickedElement = event.target.closest('.point');
+            if (!clickedElement) return;
+
+            const index = clickedElement.dataset.index;
+            const data = this.points[index];
+
+            this.openModal(data);
+        });
+
+        this.btnClose.addEventListener('click', () => {
+            this.closeModal();
+        });
     }
 
     setDebug(){
@@ -95,7 +149,33 @@ export default class Hotpoints{
 
     activate() {
         this.active = true;
-        document.querySelector('.hotpointsContainer').classList.add('active');
+        this.container.classList.add('active');
+    }
+
+    openModal(data) {
+        //Inject data
+        this.modal.querySelector('.project-title').textContent = data.title;
+        this.modal.querySelector('.project-description').textContent = data.description;
+        this.modal.querySelector('.project-link').href = data.link;
+        console.log(data);
+
+        const footer = this.modal.querySelector('.modal-footer');
+        const link = this.modal.querySelector('.project-link');
+
+        if (data.link && data.link !== '#') {
+            footer.classList.remove('hidden');
+            link.href = data.link;
+            link.textContent = data.linkText || 'Read More';
+        } else {
+            footer.classList.add('hidden');
+        }
+
+        //Show modal
+        this.modal.classList.remove('hidden');
+    }
+
+    closeModal() {
+        this.modal.classList.add('hidden');
     }
 
     update(){
