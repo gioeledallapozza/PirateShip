@@ -17,6 +17,6 @@ export default [
     {
     name: 'pirateShip',
     type: 'gltfModel',
-    path: '/textures/PirateShip/PirateShip_Draco.glb'
+    path: '/textures/PirateShip/PirateShip2_Draco.glb'
     }
 ]

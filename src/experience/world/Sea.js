@@ -122,7 +122,7 @@ export default class Sea
         this.setWaves()
 
         this.material = new THREE.ShaderMaterial({
-            precision: 'lowp',
+            // precision: 'lowp',
             vertexShader: seaVertexShader,
             fragmentShader: seaFragmentShader,
             lights: true,

@@ -9,7 +9,7 @@ export default class Hotpoints{
         this.camera = this.experience.camera;
         this.debug = this.experience.debug;
  
-
+   
         this.setPoints();
         this.setParameters();
         this.setEvents();
@@ -95,12 +95,14 @@ export default class Hotpoints{
         this.raycaster = new THREE.Raycaster();
         this.shipModel = this.experience.world.ship.model;
         this.active = false;
+        this.currentPointIndex = null;
     }
 
     setEvents(){
         //save the modal
         this.modal = document.querySelector('#project-modal');
         this.btnClose = this.modal.querySelector('.close-btn');
+        this.isAnimating = false;
 
         this.container.addEventListener('click', (event) => {
             const clickedElement = event.target.closest('.point');
@@ -109,7 +111,22 @@ export default class Hotpoints{
             const index = clickedElement.dataset.index;
             const data = this.points[index];
 
-            this.openModal(data);
+            if (this.currentPointIndex === index) return; //skip if we try to open the same modal again
+
+            if (this.currentPointIndex !== null) {
+                this.isAnimating = true;
+            
+                this.closeModal();
+            
+                setTimeout(() => {
+                    this.updateModalContent(data);
+                    this.openModal(index);
+                    this.isAnimating = false;
+                }, 600); 
+            } else {
+                this.updateModalContent(data);
+                this.openModal(index);
+            }
         });
 
         this.btnClose.addEventListener('click', () => {
@@ -143,6 +160,25 @@ export default class Hotpoints{
         }
     }
 
+    // Inject only data
+    updateModalContent(data) {
+        this.modal.querySelector('.project-title').textContent = data.title;
+        this.modal.querySelector('.project-description').textContent = data.description;
+        
+        // Gestione categoria (se l'hai aggiunta ai dati)
+        const category = this.modal.querySelector('.modal-category span');
+        if(category) category.textContent = data.category || 'Discovery';
+
+        const footer = this.modal.querySelector('.modal-footer');
+        const link = this.modal.querySelector('.project-link');
+        if (data.link && data.link !== '#') {
+            footer.classList.remove('hidden_footer'); // Usa un'altra classe per il footer
+            link.href = data.link;
+        } else {
+            footer.classList.add('hidden_footer');
+        }
+    }
+
     /**
      * Event Manager
      */
@@ -152,29 +188,13 @@ export default class Hotpoints{
         this.container.classList.add('active');
     }
 
-    openModal(data) {
-        //Inject data
-        this.modal.querySelector('.project-title').textContent = data.title;
-        this.modal.querySelector('.project-description').textContent = data.description;
-        this.modal.querySelector('.project-link').href = data.link;
-        console.log(data);
-
-        const footer = this.modal.querySelector('.modal-footer');
-        const link = this.modal.querySelector('.project-link');
-
-        if (data.link && data.link !== '#') {
-            footer.classList.remove('hidden');
-            link.href = data.link;
-            link.textContent = data.linkText || 'Read More';
-        } else {
-            footer.classList.add('hidden');
-        }
-
-        //Show modal
+    openModal(index) {
+        this.currentPointIndex = index;
         this.modal.classList.remove('hidden');
     }
 
     closeModal() {
+        this.currentPointIndex = null;
         this.modal.classList.add('hidden');
     }
 
