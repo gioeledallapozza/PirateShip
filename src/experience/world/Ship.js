@@ -52,23 +52,29 @@ export default class Ship
                 child.castShadow = true
                 child.receiveShadow = true
 
-               if (child.name.includes('Sails')) 
+                console.log(child.name)
+                if (child.name.includes('Sails')) 
                 {
+                    //Sails shares the same material so we need to create a custom attribute for the offset
+                    const count = child.geometry.attributes.position.count //Get vertex count 
+                    const randomOffsets = new Float32Array(count).fill(Math.random() * 100.0) //Same random number FILLS the array (so the single mesh is synchronized)
+                    child.geometry.setAttribute('aOffset', new THREE.BufferAttribute(randomOffsets, 1)) //Set new attribute
+                    
+                    if (child.material.uniforms && child.material.uniforms.uTime) return 
 
+                    //Create the new material (starting from the basic material)
                     const material = new CSM({
                         baseMaterial: child.material,
                         vertexShader: sailsVertexShader,
                         fragmentShader: sailsFragmentShader,
                         uniforms: {
                             uTime: new THREE.Uniform(0),
-                            uOffset: new THREE.Uniform(Math.random() * 100.0),
                             uWindSpeed: new THREE.Uniform(this.params.windSpeed),
                             uWindStrength: new THREE.Uniform(this.params.windStrength),
                             uWindPrimary: new THREE.Uniform(this.params.windPrimary),
                             uWindCounter: new THREE.Uniform(this.params.windCounter)
                         }
                     })
-
                     child.material = material
                     this.sailsMaterials.push(material)
                 }
@@ -77,13 +83,6 @@ export default class Ship
                     child.material.emissive = new THREE.Color('#9c6800') 
                     child.material.roughness = 0
                     child.material.metalness = 1.0
-                    // child.material = new THREE.MeshStandardMaterial({
-                    //     color: new THREE.Color('#000000'), 
-                    //     emissive: new THREE.Color('#ffaa00'), // Arancione caldo lanterna
-                    //     emissiveIntensity: 1, // Spinge oltre il Threshold del Bloom
-                    //     roughness: 0,
-                    //     metalness: 0.5
-                    // })
                 }
           
 

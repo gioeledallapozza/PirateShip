@@ -1,15 +1,16 @@
 uniform float uTime;
-uniform float uOffset;
 uniform float uWindSpeed;
 uniform float uWindStrength;
 uniform vec3 uWindPrimary;
 uniform vec3 uWindCounter;
 
+attribute float aOffset;
+
 varying vec2 vUv;
 
 // Simulates the force of the wind
 float getGaleForce(float time) {
-    float pulse = sin((time + uOffset) * 0.2) * sin((time + uOffset) * 0.7);
+    float pulse = sin((time + aOffset) * 0.2) * sin((time + aOffset) * 0.7);
     return smoothstep(0.4, 0.8, pulse);
 }
 
@@ -25,7 +26,7 @@ void main() {
     float mask = getCornerMask(uv);
     vec3 norm = normalize(normal);
 
-    float localTime = (uTime + uOffset) * uWindSpeed;
+    float localTime = (uTime + aOffset) * uWindSpeed;
 
     // Main Wind Drive
     float gale = getGaleForce(uTime); 
@@ -36,8 +37,8 @@ void main() {
     float currentWindDrive = mix(primaryIntensity, -counterIntensity * 1.5, gale); //Based on gale (random pulse), control witch force to use.
 
     // Wave patterns on the sails
-    float w1 = sin(uv.x * 4.0 - localTime * 5.0 + uOffset);
-    float w2 = sin(uv.x * 7.5 + uv.y * 2.0 - localTime * 8.0 + (uOffset * 0.5)) * 0.4;
+    float w1 = sin(uv.x * 4.0 - localTime * 5.0 + aOffset);
+    float w2 = sin(uv.x * 7.5 + uv.y * 2.0 - localTime * 8.0 + (aOffset * 0.5)) * 0.4;
     float w3 = sin(uv.x * 15.0 - localTime * 12.0) * 0.1;
 
     float combinedWave = mix(w1 + w2 + w3, -(w1 + w2), gale);

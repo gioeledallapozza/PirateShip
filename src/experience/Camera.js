@@ -7,6 +7,7 @@ export default class Camera {
         this.experience = new Experience();
         this.sizes = this.experience.sizes;
         this.scene = this.experience.scene;
+        this.cursor = this.experience.cursor;
         this.canvas = this.experience.canvas;
         this.debug = this.experience.debug;
 
@@ -45,14 +46,21 @@ export default class Camera {
             this.params.lookAt.z
         );
       
-        this.scene.add(this.instance);
+        // Create a group to hold the camera for mouse parallax
+        this.cameraGroup = new THREE.Group();
+        this.scene.add(this.cameraGroup);
+
+
+        this.cameraGroup.add(this.instance);
+
+        // this.scene.add(this.instance);
     }
 
     setControls() {
         this.controls = new OrbitControls(this.instance, this.canvas)
         this.controls.enabled = false 
 
-        this.controls.enableDamping = true 
+        this.controls.enableDamping = false;
 
         this.controls.enablePan = true; //Panning
         
@@ -97,7 +105,6 @@ export default class Camera {
     /*
     * Event Manager
     */
-
     resize() {
         this.instance.aspect = this.sizes.width / this.sizes.height;
 
@@ -116,6 +123,12 @@ export default class Camera {
         if(this.controls) {
             this.controls.update()
         }
+
+        const parallaxX = this.cursor.cursor.x * 1.5; 
+        const parallaxY = - this.cursor.cursor.y * 1.5;
+        //lerp for smooth transition
+        this.cameraGroup.position.x = THREE.MathUtils.lerp(this.cameraGroup.position.x, parallaxX, 0.05); 
+        this.cameraGroup.position.y = THREE.MathUtils.lerp(this.cameraGroup.position.y, parallaxY, 0.05);
     }
 
 

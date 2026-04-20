@@ -3,6 +3,7 @@ import Debug from '../utils/Debug.js';
 import Statistic from '../utils/Statistic.js'
 import Sizes from '../utils/Sizes.js';
 import Time from '../utils/Time.js';
+import Cursor from '../utils/Cursor.js';
 import Camera from './Camera.js'; 
 import Renderer from './Renderer.js';
 import World from './world/World.js';
@@ -26,6 +27,7 @@ export default class Experience {
         this.resources = new Resources();
         this.sizes = new Sizes();
         this.time = new Time();
+        this.cursor = new Cursor();
         this.scene = new THREE.Scene();
         this.camera = new Camera();
         this.renderer = new Renderer();
