@@ -54,6 +54,10 @@ export default class Experience {
         shipBox.getCenter(shipCenter)
         shipCenter.y -= 5 
 
+        this.camera.params.lookAt.x = shipCenter.x;
+        this.camera.params.lookAt.y = shipCenter.y;
+        this.camera.params.lookAt.z = shipCenter.z;
+
        gsap.to(this.camera.instance.position, {
             duration: 3,
             x: this.camera.params.immersive.x,

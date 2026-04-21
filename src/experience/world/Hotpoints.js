@@ -1,11 +1,13 @@
 import * as THREE from 'three';
 import Experience from '../Experience.js';
+import gsap from 'gsap';
 
 export default class Hotpoints{
 
     constructor(){
         this.experience = new Experience();
         this.scene = this.experience.scene;
+        this.cameraClass = this.experience.camera;
         this.camera = this.experience.camera.instance;
         this.debug = this.experience.debug;
  
@@ -22,6 +24,8 @@ export default class Hotpoints{
                 targetName: 'rudder_2',
                 offset: new THREE.Vector3(0, 0, 2),
                 position: new THREE.Vector3(-16.44, 6.65, 9.04),  //Deafult position will be overridden
+                gsapPosition: { x: -21.04, y: 10.15, z: 22.67 },
+                gsapTarget: { x: -16.44, y: 6.65, z: 9.04 },
                 category: 'Origin',
                 title: 'The Navigator',
                 description: `Computer Science student in Padua, currently in my second year.
@@ -34,6 +38,8 @@ export default class Hotpoints{
                 targetName: 'MainSail2_Sails_0',
                 offset: new THREE.Vector3(0,30,0),
                 position: new THREE.Vector3(-6.9, 27.55, 14.92),  //Deafult position will be overridden
+                gsapPosition: { x: -17.50, y: 24.15, z: 47.55 },
+                gsapTarget: { x: -5.33, y: 21.91, z: 22.78 },
                 category: 'Technical',
                 title: "Ship's Anatomy",
                 description: `This project is built with vanilla Three.js.
@@ -46,6 +52,8 @@ export default class Hotpoints{
                 targetName: 'anchor',
                 offset: new THREE.Vector3(0.10, -0.5, 0.10),
                 position: new THREE.Vector3(-0.96, 6.05, 17.86),  //Deafult position will be overridden
+                gsapPosition: { x: 1.42, y: 1.43, z: 38.12 },
+                gsapTarget: { x: 8.03, y: -0.43, z: 1.55 },
                 category: 'Philosophy',
                 title: 'Hybrid Mindset',
                 description: `I spend a good amount of time training in the gym.
@@ -58,6 +66,8 @@ export default class Hotpoints{
                 targetName: 'Jibboom_Poles_0',
                 offset: new THREE.Vector3(0, 58, 9),
                 position: new THREE.Vector3(21.9, 8.5, 31.9), //Deafult position will be overridden
+                gsapPosition: { x: -10.56, y: 7.28, z: 22.16 },
+                gsapTarget: { x: 1.73, y: 6.62, z: 27.01 },
                 category: 'Future',
                 title: 'New Horizons',
                 description: `Right now I’m learning more about React Three Fiber and advanced shader techniques.
@@ -124,33 +134,57 @@ export default class Hotpoints{
         this.btnClose = this.modal.querySelector('.close-btn');
         this.isAnimating = false;
 
+        //Event delegation for points
         this.container.addEventListener('click', (event) => {
-            const clickedElement = event.target.closest('.point');
+            if (this.isAnimating) return;
+
+            const clickedElement = event.target.closest('.point'); //Get point
+
             if (!clickedElement) return;
 
-            const index = clickedElement.dataset.index;
-            const data = this.points[index];
+            const index = clickedElement.dataset.index; //Get index
+            const data = this.points[index]; //Get data
+            
+            this.isAnimating = true;
 
-            if (this.currentPointIndex === index) return; //skip if we try to open the same modal again
+            //if we click on the same point adjust camera and exit
+            if (this.currentPointIndex === index) { 
+                this.gsapTo(data.gsapPosition, data.gsapTarget);
+                return;
+            }
 
+            // If nothing is open or we click on a different point
             if (this.currentPointIndex !== null) {
-                this.isAnimating = true;
             
+                //Close modal
                 this.closeModal();
-            
+
+                this.gsapTo(data.gsapPosition, data.gsapTarget);
+
+                //Wait for modal to close
                 setTimeout(() => {
                     this.updateModalContent(data);
                     this.openModal(index);
-                    this.isAnimating = false;
                 }, 600); 
             } else {
                 this.updateModalContent(data);
+                this.gsapTo(data.gsapPosition, data.gsapTarget);
                 this.openModal(index);
             }
         });
 
+        //Event delegation for close button
         this.btnClose.addEventListener('click', () => {
+            if (this.isAnimating) return;
+
+            this.isAnimating = true;
             this.closeModal();
+ 
+            //Return to default camera position
+            const basePosition = this.cameraClass.params.immersive; 
+            const baseTarget = this.cameraClass.params.lookAt;
+            
+            this.gsapTo(basePosition, baseTarget);
         });
     }
 
@@ -171,7 +205,8 @@ export default class Hotpoints{
 
         // Colleghiamo la GUI agli OFFSET, non alla posizione assoluta
         if (this.debug.active) {
-            this.debugFolder = this.debug.ui.addFolder('Hotpoints Offsets');
+
+            this.debugFolder = this.debug.getFolder('Hotpoints/Offsets');
             for (const point of this.points) {
                 const folder = this.debugFolder.addFolder(point.title);
                 // Modificando questi, l'offset cambia e il localToWorld nel loop fa il resto
@@ -179,7 +214,59 @@ export default class Hotpoints{
                 folder.add(point.offset, 'y', -10, 10, 0.1).name('Offset Y');
                 folder.add(point.offset, 'z', -10, 10, 0.1).name('Offset Z');
             }
+
+
+            // AGGIUNGIAMO IL TOOL PER LE CAMERE
+            const gsapCameraFolder = this.debug.getFolder('Hotpoints/GSAP');
+            
+            const debugActions = {
+                logCurrentCameraParams: () => {
+                    const pos = this.camera.position;
+                    const target = this.cameraClass.controls.target;
+                    
+                    console.log(`
+                        /* --- COPIA QUESTI DATI NEL pointsData --- */
+                        gsapPosition: { x: ${pos.x.toFixed(2)}, y: ${pos.y.toFixed(2)}, z: ${pos.z.toFixed(2)} },
+                        gsapTarget: { x: ${target.x.toFixed(2)}, y: ${target.y.toFixed(2)}, z: ${target.z.toFixed(2)} }
+                    `);
+                    
+                    alert("Parametri stampati nella console!");
+                }
+            };
+
+            // Aggiunge un bottone cliccabile nella GUI
+            gsapCameraFolder.add(debugActions, 'logCurrentCameraParams').name('Log Camera & Target');
         }
+    }
+
+    gsapTo(targetPosition, targetLookAt) {
+
+        this.cameraClass.controls.enabled = false;
+
+        // Move the camera to the target
+        gsap.to(this.camera.position, {
+            x: targetPosition.x,
+            y: targetPosition.y,
+            z: targetPosition.z,
+            duration: 1.5,
+            ease: "power2.inOut",
+            onUpdate: () => {
+               this.cameraClass.controls.update(); 
+            },
+            onComplete: () => {
+                this.cameraClass.controls.enabled = true;
+                this.isAnimating = false;
+            }
+        });
+
+        //Rotate camera to look at the target
+        gsap.to(this.cameraClass.controls.target, {
+            x: targetLookAt.x,
+            y: targetLookAt.y,
+            z: targetLookAt.z,
+            duration: 1.5,
+            ease: "power2.inOut"
+        });
     }
 
     // Inject only data
@@ -243,6 +330,12 @@ export default class Hotpoints{
             const screenPosition = point.position.clone();
             //Project the 3D position to 2D screen space
             screenPosition.project(this.camera); //Returns [-1, 1] range
+
+            //check if the point is behind the camera
+            if (screenPosition.z > 1) {
+                point.element.classList.remove('visible');
+                continue; 
+            }
 
             if (shouldCheckOcclusion) {
      

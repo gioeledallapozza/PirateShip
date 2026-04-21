@@ -60,9 +60,9 @@ export default class Camera {
         this.controls = new OrbitControls(this.instance, this.canvas)
         this.controls.enabled = false 
 
-        this.controls.enableDamping = false;
+        this.controls.enableDamping = true;
 
-        this.controls.enablePan = true; //Panning
+        this.controls.enablePan = false; //Panning
         
         // Security limit
         this.controls.maxPolarAngle = Math.PI / 2 - 0.05 
