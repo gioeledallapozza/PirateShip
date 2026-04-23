@@ -32,7 +32,8 @@ export default class Hotpoints{
 
                     I work part-time as a software developer in industrial automation, where things need to be solid, predictable, and efficient.
 
-                    At the same time, I’m exploring the creative side of development, building interactive 3D experiences for the web. This project is where those two worlds start to meet.`
+                    At the same time, I’m exploring the creative side of development, building interactive 3D experiences for the web. 
+                    This project is where those two worlds start to meet.`
             },
             {
                 targetName: 'MainSail2_Sails_0',
@@ -41,12 +42,11 @@ export default class Hotpoints{
                 gsapPosition: { x: -17.50, y: 24.15, z: 47.55 },
                 gsapTarget: { x: -5.33, y: 21.91, z: 22.78 },
                 category: 'Technical',
-                title: "Ship's Anatomy",
-                description: `This project is built with vanilla Three.js.
+                title: "Under the Canvas",
+                description: `Built entirely in vanilla Three.js to understand the mechanics behind the magic. 
 
-                    I focused on understanding what’s happening under the hood: custom shaders for the ocean, raycasting for interactions, and syncing 3D elements with the DOM.
-
-                    Not perfect, but every piece is something I wanted to understand deeply, not just use.`
+                Instead of relying on heavy abstractions, I focused on the raw implementation: writing custom shaders for the ocean, 
+                handling raycasting for interactions, and managing the math to sync 3D space with the DOM.`
             },
             {
                 targetName: 'anchor',
@@ -55,12 +55,12 @@ export default class Hotpoints{
                 gsapPosition: { x: 1.42, y: 1.43, z: 38.12 },
                 gsapTarget: { x: 8.03, y: -0.43, z: 1.55 },
                 category: 'Philosophy',
-                title: 'Hybrid Mindset',
-                description: `I spend a good amount of time training in the gym.
+                title: 'Aesthetic Engineering',
+                description: `Coming from a background where raw efficiency is everything, I realized that building something that merely "works" is no longer enough. 
 
-                    At some point I realized I approach coding in a similar way: building something that works is not enough, I also care about how it looks and feels.
-
-                    Structure matters, but so do the details.`
+                I am looking for a hybrid approach: balancing robust, structured architecture with high-end visual aesthetics. 
+                
+                The code must be solid, but the experience must be beautiful.`
             },
             {
                 targetName: 'Jibboom_Poles_0',
@@ -70,11 +70,11 @@ export default class Hotpoints{
                 gsapTarget: { x: 1.73, y: 6.62, z: 27.01 },
                 category: 'Future',
                 title: 'New Horizons',
-                description: `Right now I’m learning more about React Three Fiber and advanced shader techniques.
+                description: `This vanilla prototype is a foundational step, not the final destination. 
 
-                    This project is just a step, not a final product.
+                The next stage of my journey involves React Three Fiber and advanced shader programming. 
 
-                    I’m trying to get better at building things that are not only functional, but also engaging to explore.`
+                The ultimate goal is to craft immersive web environments that users actually want to explore, turning code into interactive art.`
             }
         ];
 
@@ -142,6 +142,18 @@ export default class Hotpoints{
 
             if (!clickedElement) return;
 
+            // add class tap-active to label and text to give an animation
+            const label = clickedElement.querySelector('.label');
+            const text = clickedElement.querySelector('.text'); 
+
+            if (label) label.classList.add('tap-active');
+            if (text) text.classList.add('tap-active');
+
+            setTimeout(() => {
+                if (label) label.classList.remove('tap-active');
+                if (text) text.classList.remove('tap-active');
+            }, 250);
+
             const index = clickedElement.dataset.index; //Get index
             const data = this.points[index]; //Get data
             
@@ -184,8 +196,8 @@ export default class Hotpoints{
             const basePosition = this.cameraClass.params.immersive; 
             const baseTarget = this.cameraClass.params.lookAt;
             
-            this.gsapTo(basePosition, baseTarget);
-        });
+            this.gsapTo(basePosition, baseTarget, true);
+        }); 
     }
 
     setDebug() {
@@ -239,9 +251,12 @@ export default class Hotpoints{
         }
     }
 
-    gsapTo(targetPosition, targetLookAt) {
+    gsapTo(targetPosition, targetLookAt, isReturning = false) {
 
         this.cameraClass.controls.enabled = false;
+
+        this.container.style.transition = 'opacity 0.2s ease';
+        this.container.style.opacity = '0';
 
         // Move the camera to the target
         gsap.to(this.camera.position, {
@@ -254,8 +269,14 @@ export default class Hotpoints{
                this.cameraClass.controls.update(); 
             },
             onComplete: () => {
-                this.cameraClass.controls.enabled = true;
                 this.isAnimating = false;
+
+                if (isReturning) {
+                    this.cameraClass.controls.enabled = true;
+                }
+
+                this.container.style.transition = 'opacity 0.5s ease-in';
+                this.container.style.opacity = '1';
             }
         });
 
@@ -278,14 +299,14 @@ export default class Hotpoints{
         const category = this.modal.querySelector('.modal-category span');
         if(category) category.textContent = data.category || 'Discovery';
 
-        const footer = this.modal.querySelector('.modal-footer');
-        const link = this.modal.querySelector('.project-link');
-        if (data.link && data.link !== '#') {
-            footer.classList.remove('hidden_footer'); // Usa un'altra classe per il footer
-            link.href = data.link;
-        } else {
-            footer.classList.add('hidden_footer');
-        }
+        // const footer = this.modal.querySelector('.modal-footer');
+        // const link = this.modal.querySelector('.project-link');
+        // if (data.link && data.link !== '#') {
+        //     footer.classList.remove('hidden_footer'); // Usa un'altra classe per il footer
+        //     link.href = data.link;
+        // } else {
+        //     footer.classList.add('hidden_footer');
+        // }
     }
 
     /**
@@ -300,15 +321,22 @@ export default class Hotpoints{
     openModal(index) {
         this.currentPointIndex = index;
         this.modal.classList.remove('hidden');
+
+        this.points.forEach(p => p.element.classList.remove('is-active'));
+        if (this.points[index] && this.points[index].element) {
+            this.points[index].element.classList.add('is-active');
+        }
     }
 
     closeModal() {
         this.currentPointIndex = null;
         this.modal.classList.add('hidden');
+
+        this.points.forEach(p => p.element.classList.remove('is-active'));
     }
 
     update(){
-        if (!this.active) return;
+        if (!this.active || this.isAnimating) return;
         this.frameCount++;
 
         const shouldCheckOcclusion = this.frameCount % 5 === 0;

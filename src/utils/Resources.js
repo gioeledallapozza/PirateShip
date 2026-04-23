@@ -66,6 +66,10 @@ export default class Resources extends EventEmitter
         this.items[source.name] = file
         this.loaded++
 
+        //Calculate progress and trigger event
+        const progressRatio = this.loaded / this.toLoad
+        this.trigger('progress', [progressRatio])
+
         if (this.loaded === this.toLoad) {
             this.trigger('ready')
         }

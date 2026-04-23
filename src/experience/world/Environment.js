@@ -23,6 +23,10 @@ export default class Environment
             azimuth: 160,   //180 (telefono)
             exposure: 1.0,
 
+            hemiSkyColor: '#ffddcc',   // Luce del cielo (calda)
+            hemiGroundColor: '#1d2a3a', // Luce di rimbalzo dal mare (blu scuro)
+            hemiIntensity: 0.6,         // Intensità base
+
             //Shadow
             shadowSize: 30, 
             shadowNear: 1,
@@ -35,6 +39,7 @@ export default class Environment
 
         this.setSky()
         this.setFog()
+        this.setAmbientLight()
         this.updateSun()
         this.setDebug()
     }
@@ -55,6 +60,15 @@ export default class Environment
     setFog(){
         const fogColor = '#d8a08f'; 
         this.scene.fog = new THREE.FogExp2(fogColor, 0.007);
+    }
+
+    setAmbientLight() {
+        this.hemiLight = new THREE.HemisphereLight(
+            this.params.hemiSkyColor, 
+            this.params.hemiGroundColor, 
+            this.params.hemiIntensity
+        );
+        this.scene.add(this.hemiLight);
     }
 
     updateSun() {
@@ -140,6 +154,19 @@ export default class Environment
             fogFolder.add(this.scene.fog, 'density', 0, 0.1, 0.001).name('Fog Density');
             fogFolder.addColor(this.scene.fog, 'color').name('Fog Color');
             fogFolder.close();
+
+            //Hemisphere light
+            const hemiFolder = this.debug.getFolder('World/Environment/Hemisphere');
+            hemiFolder.addColor(this.params, 'hemiSkyColor').name('Sky Color').onChange(() => {
+                this.hemiLight.color.set(this.params.hemiSkyColor);
+            });
+            hemiFolder.addColor(this.params, 'hemiGroundColor').name('Ground Color').onChange(() => {
+                this.hemiLight.groundColor.set(this.params.hemiGroundColor);
+            });
+            hemiFolder.add(this.params, 'hemiIntensity', 0, 3, 0.01).name('Intensity').onChange(() => {
+                this.hemiLight.intensity = this.params.hemiIntensity;
+            });
+            hemiFolder.close();
 
             //Shadow
             const shadowFolder = this.debug.getFolder('World/Environment/Shadows');

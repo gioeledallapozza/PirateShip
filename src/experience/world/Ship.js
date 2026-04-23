@@ -52,7 +52,6 @@ export default class Ship
                 child.castShadow = true
                 child.receiveShadow = true
 
-                console.log(child.name)
                 if (child.name.includes('Sails')) 
                 {
                     //Sails shares the same material so we need to create a custom attribute for the offset
