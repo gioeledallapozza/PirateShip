@@ -313,7 +313,7 @@ h1 {
     /* Visibility setup */
     opacity: 0;
     visibility: hidden;
-    transition: opacity 2s ease-in-out, visibility 2s ease-in-out;
+    transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
 }
 
 #tutorial-ui.visible {
@@ -720,14 +720,14 @@ h1 {
     
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
-    transition: all 0.3s ease;
+    transform: translateX(0);
+    transition: all 1s ease-in;
 }
 
 .btn-exit svg {
     width: 18px;
     height: 18px;
-    transition: transform 0.3s ease;
+    transition: transform 0.7s ease;
 }
 
 .btn-exit:hover {
@@ -742,11 +742,11 @@ h1 {
 .btn-exit.hidden {
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-20px);
+    transform: translateX(-20px);
     pointer-events: none;
+    transition: all 0.3s ease-out;
 }
 
-/* Su mobile lo centriamo in alto così è facile da tappare e non si sovrappone a niente */
 @media screen and (max-width: 600px) {
     .btn-exit {
         top: 20px;

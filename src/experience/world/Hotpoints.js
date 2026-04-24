@@ -27,13 +27,12 @@ export default class Hotpoints{
                 gsapPosition: { x: -21.04, y: 10.15, z: 22.67 },
                 gsapTarget: { x: -16.44, y: 6.65, z: 9.04 },
                 category: 'Origin',
-                title: 'The Navigator',
-                description: `Computer Science student in Padua, currently in my second year.
+                title: 'Charting the Course',
+                description: `My interest in Computer Science started early, long before university.
 
-                    I work part-time as a software developer in industrial automation, where things need to be solid, predictable, and efficient.
+I studied at ITIS Rossi and I’m currently pursuing a degree in Computer Science at the University of Padua.
 
-                    At the same time, I’m exploring the creative side of development, building interactive 3D experiences for the web. 
-                    This project is where those two worlds start to meet.`
+At the same time, I work part-time as a developer at RBFDMAT. It’s my way of staying connected to both sides of this field: theory and real-world problems.`
             },
             {
                 targetName: 'MainSail2_Sails_0',
@@ -43,10 +42,11 @@ export default class Hotpoints{
                 gsapTarget: { x: -5.33, y: 21.91, z: 22.78 },
                 category: 'Technical',
                 title: "Under the Canvas",
-                description: `Built entirely in vanilla Three.js to understand the mechanics behind the magic. 
+                description: `This project is where I really started exploring three.js and the WebGL world.
 
-                Instead of relying on heavy abstractions, I focused on the raw implementation: writing custom shaders for the ocean, 
-                handling raycasting for interactions, and managing the math to sync 3D space with the DOM.`
+The challenge wasn’t just making it look good, but making it run well. Keeping everything smooth at 60 FPS across devices forced me to think about performance, not just visuals.
+
+It made me realize how much depth there is behind interactive 3D experiences.`
             },
             {
                 targetName: 'anchor',
@@ -55,12 +55,12 @@ export default class Hotpoints{
                 gsapPosition: { x: 1.42, y: 1.43, z: 38.12 },
                 gsapTarget: { x: 8.03, y: -0.43, z: 1.55 },
                 category: 'Philosophy',
-                title: 'Aesthetic Engineering',
-                description: `Coming from a background where raw efficiency is everything, I realized that building something that merely "works" is no longer enough. 
+                title: 'Dropping Anchor',
+                description: `I don’t spend all my time coding.
 
-                I am looking for a hybrid approach: balancing robust, structured architecture with high-end visual aesthetics. 
-                
-                The code must be solid, but the experience must be beautiful.`
+Training is an important part of my routine. For me, physical health and mental clarity go together.
+
+Over time I noticed that the way I train is similar to how I code: attention to detail, consistency, and focusing on small improvements that compound over time.`
             },
             {
                 targetName: 'Jibboom_Poles_0',
@@ -70,11 +70,11 @@ export default class Hotpoints{
                 gsapTarget: { x: 1.73, y: 6.62, z: 27.01 },
                 category: 'Future',
                 title: 'New Horizons',
-                description: `This vanilla prototype is a foundational step, not the final destination. 
+                description: `This project is just a starting point, not the final destination.
 
-                The next stage of my journey involves React Three Fiber and advanced shader programming. 
+There’s still a lot I want to explore, from React Three Fiber to WebGPU and beyond.
 
-                The ultimate goal is to craft immersive web environments that users actually want to explore, turning code into interactive art.`
+The goal is to build interactive experiences that feel alive, something people actually want to explore, not just scroll past.`
             }
         ];
 

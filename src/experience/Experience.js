@@ -53,8 +53,6 @@ export default class Experience {
 
     //Start experience
     start() {
-        const exitBtn = document.getElementById('exit-experience');
-        if(exitBtn) exitBtn.classList.remove('hidden');
 
         gsap.killTweensOf(this.camera.instance.position);
         gsap.killTweensOf(this.camera.controls.target);
@@ -111,11 +109,14 @@ export default class Experience {
                 window.addEventListener('wheel', hideTutorial);
             }
         })
+
+        setTimeout(() => {
+            const exitBtn = document.getElementById('exit-experience');
+            if(exitBtn) exitBtn.classList.remove('hidden');
+        }, 2500);
     }
 
     exit() {
-        const exitBtn = document.getElementById('exit-experience');
-        if(exitBtn) exitBtn.classList.add('hidden');
 
         gsap.killTweensOf(this.camera.instance.position);
         gsap.killTweensOf(this.camera.controls.target);
@@ -152,6 +153,11 @@ export default class Experience {
             z: 0,
             ease: "power2.inOut"
         });
+
+        setTimeout(() => {
+                const exitBtn = document.getElementById('exit-experience');
+                if(exitBtn) exitBtn.classList.add('hidden');
+        }, 2500);
     }
 
     /**
