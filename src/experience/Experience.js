@@ -122,9 +122,7 @@ export default class Experience {
         gsap.killTweensOf(this.camera.controls.target);
       
         if (this.world.hotpoints) {
-            this.world.hotpoints.active = false;
-            this.world.hotpoints.container.classList.remove('active');
-            this.world.hotpoints.closeModal(); 
+            this.world.hotpoints.reset();
         }
 
   
