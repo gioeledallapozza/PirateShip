@@ -313,9 +313,27 @@ The goal is to build interactive experiences that feel alive, something people a
      * Event Manager
      */
 
+    reset() {
+        // Forza lo stato a "riposo"
+        this.active = false;
+        this.isAnimating = false; 
+        this.container.style.opacity = '0';
+        this.container.classList.remove('active');
+        this.closeModal();
+        
+        // Spegni tutti i punti
+        this.points.forEach(p => p.element.classList.remove('visible', 'is-active'));
+    }
+
     activate() {
         this.active = true;
+        this.isAnimating = false;
+
+        this.update();
+
         this.container.classList.add('active');
+        this.container.style.transition = 'opacity 0.5s ease-in';
+        this.container.style.opacity = '1'
     }
 
     openModal(index) {
