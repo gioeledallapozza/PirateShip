@@ -32,7 +32,7 @@ export default class Hotpoints{
 
 I studied at ITIS Rossi and I’m currently pursuing a degree in Computer Science at the University of Padua.
 
-At the same time, I work part-time as a developer at RBFDMAT. It’s my way of staying connected to both sides of this field: theory and real-world problems.`
+For the past two years I worked as a part-time developer at RBFDMAT, where I built a complex data logging system end-to-end — my way of staying connected to both sides of this field: theory and real-world problems. I’m now applying that same approach to real-time 3D on the web as an independent developer.`
             },
             {
                 targetName: 'MainSail2_Sails_0',
@@ -70,9 +70,9 @@ Over time I noticed that the way I train is similar to how I code: attention to 
                 gsapTarget: { x: 1.73, y: 6.62, z: 27.01 },
                 category: 'Future',
                 title: 'New Horizons',
-                description: `This project is just a starting point, not the final destination.
+                description: `This project was just a starting point, not the final destination.
 
-There’s still a lot I want to explore, from React Three Fiber to WebGPU and beyond.
+Since then I’ve gone deeper into React Three Fiber, real-time PBR materials, and production-grade 3D configurators — including a full Porsche 911 GT3 RS configurator with zero-delay material switching. WebGPU is next.
 
 The goal is to build interactive experiences that feel alive, something people actually want to explore, not just scroll past.`
             }
